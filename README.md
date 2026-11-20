@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ô Số Đồng Đội
 
-## Getting Started
+Trò chơi đố vui chia đội cho lớp học: chọn bộ câu hỏi, chia đội, lật ô số và cộng điểm. Có sẵn nhiều bộ câu hỏi tiếng Việt, và bạn có thể tự tạo bộ câu hỏi riêng.
 
-First, run the development server:
+## Chạy trên máy
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cơ sở dữ liệu miễn phí (Upstash Redis)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Không có cơ sở dữ liệu, bộ câu hỏi tự tạo chỉ được lưu trong trình duyệt (localStorage). Khi kết nối Upstash Redis, bộ câu hỏi được chia sẻ giữa mọi thiết bị.
 
-## Learn More
+1. Vercel → dự án `team-quiz` → **Storage** → **Create Database** → **Upstash for Redis** (gói Free).
+2. **Connect** với tất cả môi trường (Production, Preview, Development).
+3. **Deployments** → **Redeploy**.
 
-To learn more about Next.js, take a look at the following resources:
+Vercel tự thêm `KV_REST_API_URL` và `KV_REST_API_TOKEN`. Khi chạy trên máy, chép `.env.example` thành `.env.local` rồi điền hai giá trị này (hoặc chạy `vercel env pull .env.local`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Bộ câu hỏi đã lưu trên trình duyệt sẽ được tự động tải lên lần đầu khi có cơ sở dữ liệu.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Mã PIN chỉnh sửa (tùy chọn)
 
-## Deploy on Vercel
+Mặc định ai mở trang cũng có thể thêm, sửa, xóa bộ câu hỏi dùng chung. Để giới hạn, đặt biến môi trường `EDIT_PIN` trên Vercel rồi Redeploy. Khi lưu hoặc xóa, trang sẽ hỏi mã PIN một lần và ghi nhớ trên thiết bị đó.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Giới hạn: tối đa 500 bộ câu hỏi dùng chung.

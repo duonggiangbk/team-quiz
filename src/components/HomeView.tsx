@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CATEGORIES } from "@/lib/builtinSets";
-import { loadGame, loadSets, saveGame, saveSets } from "@/lib/storage";
+import { deleteSet, fetchSets, loadGame, saveGame } from "@/lib/storage";
 import type { GameState, QuestionSet } from "@/lib/types";
 
 const ALL = "Tất cả";
@@ -14,7 +14,11 @@ function normalize(text: string) {
 }
 
 export default function HomeView() {
-  const [sets, setSets] = useState<QuestionSet[]>(() => loadSets());
+  const [sets, setSets] = useState<QuestionSet[]>([]);
+  const [sharedIds, setSharedIds] = useState<Set<string>>(() => new Set());
+  const [cloud, setCloud] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [game, setGame] = useState<GameState | null>(() => loadGame());
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(ALL);
@@ -27,12 +31,34 @@ export default function HomeView() {
     });
   }, [sets, query, category]);
 
-  function remove(id: string) {
+  useEffect(() => {
+    let cancelled = false;
+    fetchSets().then((result) => {
+      if (cancelled) return;
+      setSets(result.sets);
+      setSharedIds(result.sharedIds);
+      setCloud(result.cloud);
+      setError(result.error ?? "");
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function remove(id: string) {
     const set = sets.find((s) => s.id === id);
-    if (!set || !window.confirm(`Xóa bộ câu hỏi "${set.title}"?`)) return;
-    const next = sets.filter((s) => s.id !== id);
-    saveSets(next);
-    setSets(next);
+    if (!set) return;
+    const warning = sharedIds.has(id) ? " Bộ này sẽ bị xóa cho mọi người." : "";
+    if (!window.confirm(`Xóa bộ câu hỏi "${set.title}"?${warning}`)) return;
+    try {
+      await deleteSet(id, sharedIds.has(id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Không xóa được bộ câu hỏi.");
+      return;
+    }
+    setError("");
+    setSets((prev) => prev.filter((s) => s.id !== id));
     if (game?.setId === id) {
       saveGame(null);
       setGame(null);
@@ -80,6 +106,12 @@ export default function HomeView() {
           + Tạo bộ mới
         </Link>
       </div>
+      {!loading && (
+        <p className="-mt-2 mb-3 text-sm text-slate-500">
+          {cloud ? "☁️ Đang dùng cơ sở dữ liệu chung – bộ bạn tạo hiện trên mọi máy." : "💾 Lưu trên trình duyệt này."}
+        </p>
+      )}
+      {error && <p className="mb-3 rounded-xl bg-rose-50 p-3 text-sm font-semibold text-rose-700">{error}</p>}
 
       <input
         type="search"
@@ -105,16 +137,25 @@ export default function HomeView() {
 
       {shown.length === 0 ? (
         <p className="rounded-2xl bg-white p-6 text-center text-slate-500">
-          {sets.length === 0 ? "Chưa có bộ câu hỏi nào. Hãy tạo bộ mới!" : "Không tìm thấy bộ câu hỏi phù hợp."}
+          {loading ? "Đang tải…" : sets.length === 0 ? "Chưa có bộ câu hỏi nào. Hãy tạo bộ mới!" : "Không tìm thấy bộ câu hỏi phù hợp."}
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {shown.map((set) => (
             <li key={set.id} className="flex flex-col rounded-2xl bg-white p-5 shadow">
-              {set.category && (
-                <span className="mb-1 self-start rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600">
-                  {set.category}
-                </span>
+              {(set.category || sharedIds.has(set.id)) && (
+                <div className="mb-1 flex flex-wrap gap-1">
+                  {set.category && (
+                    <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600">
+                      {set.category}
+                    </span>
+                  )}
+                  {sharedIds.has(set.id) && (
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                      ☁️ Chia sẻ
+                    </span>
+                  )}
+                </div>
               )}
               <h3 className="text-xl font-bold text-slate-800">{set.title || "(Chưa đặt tên)"}</h3>
               {set.description && <p className="mt-1 text-sm text-slate-500">{set.description}</p>}

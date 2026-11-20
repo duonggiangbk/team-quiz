@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import QuestionModal from "@/components/QuestionModal";
 import Scoreboard from "@/components/Scoreboard";
 import TileGrid from "@/components/TileGrid";
 import WinnerScreen from "@/components/WinnerScreen";
 import { DEFAULT_TEAM_NAMES, TEAM_COLORS, createGame, isFinished, resolvePowerUp, resolveQuestion } from "@/lib/game";
-import { loadGame, loadSets, saveGame } from "@/lib/storage";
+import { fetchSet, loadGame, saveGame } from "@/lib/storage";
 import type { GameState, PowerUpFrequency, QuestionSet } from "@/lib/types";
 
 export default function PlayView() {
   const params = useSearchParams();
   const setId = params.get("set");
-  const [set] = useState<QuestionSet | undefined>(() => loadSets().find((s) => s.id === setId));
+  const [set, setSet] = useState<QuestionSet | null | undefined>(undefined);
   const [game, setGame] = useState<GameState | null>(() => {
     if (params.get("resume") !== "1") return null;
     const saved = loadGame();
@@ -22,9 +22,23 @@ export default function PlayView() {
   });
   const [openTile, setOpenTile] = useState<string | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    (setId ? fetchSet(setId) : Promise.resolve(null)).then((s) => {
+      if (!cancelled) setSet(s);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [setId]);
+
   function update(next: GameState | null) {
     setGame(next);
     saveGame(next);
+  }
+
+  if (set === undefined) {
+    return <main className="mx-auto max-w-xl flex-1 p-6 text-center text-lg text-slate-500">Đang tải…</main>;
   }
 
   if (!set) {

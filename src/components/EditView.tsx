@@ -2,37 +2,60 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { loadSets, newId, newQuestion, saveSets } from "@/lib/storage";
+import { useEffect, useState } from "react";
+import { fetchSet, newId, newQuestion, upsertSet } from "@/lib/storage";
 import type { Question, QuestionSet } from "@/lib/types";
 
-function initialSet(id: string | null): QuestionSet {
-  const existing = id ? loadSets().find((s) => s.id === id) : undefined;
-  if (existing) return existing;
+function blankSet(): QuestionSet {
   return { id: newId(), title: "", description: "", questions: [newQuestion(), newQuestion(), newQuestion()], updatedAt: Date.now() };
 }
 
 export default function EditView() {
-  const router = useRouter();
   const params = useSearchParams();
-  const [set, setSet] = useState<QuestionSet>(() => initialSet(params.get("id")));
+  const id = params.get("id");
+  const [initial, setInitial] = useState<QuestionSet | null>(() => (id ? null : blankSet()));
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    fetchSet(id).then((s) => {
+      if (!cancelled) setInitial(s ?? blankSet());
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (!initial) {
+    return <main className="mx-auto max-w-xl flex-1 p-6 text-center text-lg text-slate-500">Đang tải…</main>;
+  }
+  return <Editor key={initial.id} initial={initial} />;
+}
+
+function Editor({ initial }: { initial: QuestionSet }) {
+  const router = useRouter();
+  const [set, setSet] = useState<QuestionSet>(initial);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   function updateQuestion(id: string, patch: Partial<Question>) {
     setSet((s) => ({ ...s, questions: s.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) }));
   }
 
-  function save() {
+  async function save() {
     if (!set.title.trim()) return setError("Hãy nhập tên bộ câu hỏi.");
     const questions = set.questions.filter((q) => q.prompt.trim());
     if (questions.length < 2) return setError("Cần ít nhất 2 câu hỏi có nội dung.");
     const saved = { ...set, title: set.title.trim(), questions, updatedAt: Date.now() };
-    const sets = loadSets();
-    const idx = sets.findIndex((s) => s.id === saved.id);
-    if (idx >= 0) sets[idx] = saved;
-    else sets.push(saved);
-    saveSets(sets);
-    router.push("/");
+    setSaving(true);
+    setError("");
+    try {
+      await upsertSet(saved);
+      router.push("/");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Không lưu được bộ câu hỏi.");
+      setSaving(false);
+    }
   }
 
   return (
@@ -124,9 +147,10 @@ export default function EditView() {
         <button
           type="button"
           onClick={save}
-          className="flex-1 rounded-xl bg-indigo-600 py-3 text-lg font-bold text-white hover:bg-indigo-700"
+          disabled={saving}
+          className="flex-1 rounded-xl bg-indigo-600 py-3 text-lg font-bold text-white hover:bg-indigo-700 disabled:opacity-60"
         >
-          Lưu bộ câu hỏi
+          {saving ? "Đang lưu…" : "Lưu bộ câu hỏi"}
         </button>
       </div>
     </main>
