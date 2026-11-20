@@ -1,4 +1,5 @@
 import type { QuestionSet } from "./types";
+import { KIDS_ENGLISH_SETS, PRESCHOOL, PRIMARY } from "./kidsEnglishSets";
 
 type Pair = [prompt: string, answer: string];
 
@@ -14,7 +15,7 @@ function build(slug: string, category: string, title: string, description: strin
   };
 }
 
-export const CATEGORIES = ["Toán", "Tiếng Anh", "Khoa học", "Địa lý", "Lịch sử", "Tiếng Việt", "Đời sống", "Giải trí"] as const;
+export const CATEGORIES = ["Toán", "Tiếng Anh", PRESCHOOL, PRIMARY, "Khoa học", "Địa lý", "Lịch sử", "Tiếng Việt", "Đời sống", "Giải trí"] as const;
 
 export const BUILTIN_SETS: QuestionSet[] = [
   build("math-add-sub", "Toán", "Cộng trừ trong phạm vi 100", "Tính nhẩm nhanh cho học sinh tiểu học.", [
@@ -397,4 +398,5 @@ export const BUILTIN_SETS: QuestionSet[] = [
     ["Trung thu trẻ em thường rước đèn hình gì nổi tiếng?", "Đèn ông sao"],
     ["Giỗ Tổ Hùng Vương vào ngày nào âm lịch?", "10/3 âm lịch"],
   ]),
+  ...KIDS_ENGLISH_SETS.map((s) => build(s.slug, s.category, s.title, s.description, s.pairs)),
 ];

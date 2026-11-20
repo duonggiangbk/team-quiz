@@ -2,6 +2,8 @@
 
 Trò chơi đố vui chia đội cho lớp học: chọn bộ câu hỏi, chia đội, lật ô số và cộng điểm. Có sẵn nhiều bộ câu hỏi tiếng Việt, và bạn có thể tự tạo bộ câu hỏi riêng.
 
+Có các bộ hỗ trợ giáo viên dạy tiếng Anh cho trẻ, thuộc hai chủ đề "Anh văn mầm non" và "Anh văn tiểu học".
+
 ## Chạy trên máy
 
 ```bash
