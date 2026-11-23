@@ -2,15 +2,41 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FLASHCARD_DECKS } from "@/lib/flashcards";
+import FlashcardEditor from "@/components/FlashcardEditor";
+import { FLASHCARD_DECKS, parseFlashcardDeck, type FlashcardDeck } from "@/lib/flashcards";
 
+const STORAGE_KEY = "team-quiz:flashcard-decks";
 export default function FlashcardsPage() {
-  const [deckIndex, setDeckIndex] = useState(0);
+  const [customDecks, setCustomDecks] = useState<FlashcardDeck[]>([]);
+  const [selectedId, setSelectedId] = useState(FLASHCARD_DECKS[0].id);
+  const [editor, setEditor] = useState<"new" | string | null>(null);
+  const [storageReady, setStorageReady] = useState(false);
+  const [storageError, setStorageError] = useState("");
   const [cardIndex, setCardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [speechError, setSpeechError] = useState("");
-  const deck = FLASHCARD_DECKS[deckIndex];
+  const decks = [...FLASHCARD_DECKS, ...customDecks];
+  const deck = decks.find((item) => item.id === selectedId) ?? FLASHCARD_DECKS[0];
   const card = deck.cards[cardIndex];
+
+  useEffect(() => {
+    let active = true;
+    Promise.resolve().then(() => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        const parsed: unknown = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed) || parsed.length > 100) throw new Error();
+        const loaded = parsed.map(parseFlashcardDeck);
+        if (loaded.some((item) => typeof item === "string")) throw new Error();
+        const valid = loaded.filter((item): item is FlashcardDeck => typeof item !== "string");
+        if (new Set([...FLASHCARD_DECKS, ...valid].map((item) => item.id)).size !== FLASHCARD_DECKS.length + valid.length) throw new Error();
+        if (active) { setCustomDecks(valid); setStorageReady(true); }
+      } catch {
+        if (active) setStorageError("Không đọc được bộ thẻ đã lưu trên trình duyệt. Dữ liệu cũ được giữ nguyên; hãy kiểm tra quyền lưu trữ.");
+      }
+    });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => () => {
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -21,11 +47,35 @@ export default function FlashcardsPage() {
     setSpeechError("");
   }
 
-  function selectDeck(index: number) {
+  function selectDeck(id: string) {
     stopSpeech();
-    setDeckIndex(index);
+    setSelectedId(id);
     setCardIndex(0);
     setFlipped(false);
+  }
+
+  function saveDeck(value: FlashcardDeck) {
+    const exists = customDecks.some((item) => item.id === value.id);
+    if (!exists && customDecks.length >= 100) throw new Error("Đã đạt giới hạn 100 bộ thẻ.");
+    const next = exists ? customDecks.map((item) => item.id === value.id ? value : item) : [...customDecks, value];
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { throw new Error("Không lưu được bộ thẻ trên trình duyệt. Hãy kiểm tra dung lượng hoặc quyền lưu trữ."); }
+    setCustomDecks(next);
+    selectDeck(value.id);
+    setEditor(null);
+  }
+
+  function deleteDeck() {
+    if (!window.confirm(`Xóa bộ thẻ "${deck.title}" trên trình duyệt này?`)) return;
+    const next = customDecks.filter((item) => item.id !== deck.id);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setCustomDecks(next);
+      selectDeck(FLASHCARD_DECKS[0].id);
+      setStorageError("");
+    } catch {
+      setStorageError("Không xóa được bộ thẻ trên trình duyệt. Hãy kiểm tra quyền lưu trữ.");
+    }
   }
 
   function moveCard(index: number) {
@@ -60,12 +110,17 @@ export default function FlashcardsPage() {
         <p className="mt-2">Chọn chủ đề, nghe từ và lật thẻ để khám phá nghĩa nhé!</p>
       </header>
 
+      <p className="mb-3 text-sm text-slate-700">Bộ thẻ tự tạo chỉ lưu trên trình duyệt này, không tự đồng bộ giữa các thiết bị.</p>
+      {storageError && <p role="alert" className="mb-4 rounded-xl bg-rose-50 p-3 text-rose-700">{storageError}</p>}
+      {storageReady && !editor && <button type="button" onClick={() => setEditor("new")} className="mb-5 rounded-xl bg-violet-600 px-4 py-3 font-bold text-white">+ Tạo bộ thẻ mới</button>}
+      {editor && <FlashcardEditor key={editor} initial={editor === "new" ? undefined : customDecks.find((item) => item.id === editor)} onSave={saveDeck} onCancel={() => setEditor(null)} />}
+
       <section aria-label="Chọn chủ đề" className="mb-5">
         <h2 className="mb-3 text-lg font-bold">Chọn chủ đề</h2>
         <div className="flex flex-wrap gap-2">
-          {FLASHCARD_DECKS.map((item, index) => (
-            <button key={item.id} type="button" onClick={() => selectDeck(index)} aria-pressed={index === deckIndex}
-              className={`rounded-full px-4 py-2 font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${index === deckIndex ? "bg-indigo-600 text-white" : "bg-white text-indigo-700 hover:bg-indigo-50"}`}>
+          {decks.map((item) => (
+            <button key={item.id} type="button" onClick={() => selectDeck(item.id)} aria-pressed={item.id === deck.id}
+              className={`rounded-full px-4 py-2 font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${item.id === deck.id ? "bg-indigo-600 text-white" : "bg-white text-indigo-700 hover:bg-indigo-50"}`}>
               <span aria-hidden="true">{item.icon} </span>{item.title}
             </button>
           ))}
@@ -77,6 +132,10 @@ export default function FlashcardsPage() {
           <h2 className="text-xl font-extrabold text-indigo-800">{deck.icon} {deck.title}</h2>
           <p className="font-bold text-slate-600" aria-live="polite">Thẻ {cardIndex + 1} / {deck.cards.length}</p>
         </div>
+        {storageReady && !editor && customDecks.some((item) => item.id === deck.id) && <div className="mb-4 flex gap-3">
+          <button type="button" onClick={() => setEditor(deck.id)} className="font-bold text-indigo-700">✏️ Sửa bộ thẻ</button>
+          <button type="button" onClick={deleteDeck} className="font-bold text-rose-700">🗑 Xóa bộ thẻ</button>
+        </div>}
         <button type="button" onClick={() => setFlipped(!flipped)}
           aria-label={flipped ? `Nghĩa: ${card.vietnamese}. Lật về tiếng Anh` : `Từ tiếng Anh: ${card.english}. Lật xem nghĩa`}
           className="flex min-h-64 w-full flex-col items-center justify-center gap-4 rounded-3xl border-4 border-indigo-100 bg-gradient-to-br from-sky-50 to-pink-50 p-6 text-center hover:border-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">

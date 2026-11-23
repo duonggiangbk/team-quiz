@@ -26,7 +26,6 @@ export const GAME_CATALOG: GameCatalogItem[] = [
   { id: "matching", title: "Kéo thả nối ý", description: "Ghép các ý tương ứng với nhau.", icon: "🧷", status: "planned" },
   { id: "crossword", title: "Ô chữ khóa bí mật", description: "Giải câu hỏi để khám phá ô chữ.", icon: "🔠", status: "planned" },
   { id: "flashcards", title: "Thẻ lật tiếng Anh", description: "Học từ tiếng Anh bằng thẻ lật có sẵn.", icon: "🃏", status: "flashcards" },
-  { id: "group-flashcards", title: "Thẻ học nhóm", description: "Tạo thẻ và cùng học theo nhóm.", icon: "📇", status: "planned" },
   { id: "mind-map", title: "Sơ đồ tư duy", description: "Sắp xếp và ôn tập ý chính của bài học.", icon: "💡", status: "planned" },
   { id: "gallery", title: "Phòng tranh 3D", description: "Khám phá tranh trong không gian 3D.", icon: "🎨", status: "planned" },
   { id: "interactive-video", title: "Video tương tác", description: "Học cùng video và câu hỏi.", icon: "🎬", status: "planned" },

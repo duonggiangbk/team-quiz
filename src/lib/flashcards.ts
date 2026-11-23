@@ -11,6 +11,34 @@ export interface FlashcardDeck {
   cards: Flashcard[];
 }
 
+export const MAX_FLASHCARDS = 30;
+
+export function parseFlashcards(value: unknown, expectedCount?: number): Flashcard[] | string {
+  if (!Array.isArray(value) || value.length < 1 || value.length > MAX_FLASHCARDS || (expectedCount !== undefined && value.length !== expectedCount)) {
+    return "Số thẻ không hợp lệ.";
+  }
+  const cards: Flashcard[] = [];
+  for (const item of value) {
+    if (!item || typeof item !== "object") return "Nội dung thẻ không hợp lệ.";
+    const raw = item as Record<string, unknown>;
+    if (typeof raw.english !== "string" || !raw.english.trim() || raw.english.length > 100 ||
+        typeof raw.vietnamese !== "string" || !raw.vietnamese.trim() || raw.vietnamese.length > 100 ||
+        typeof raw.picture !== "string" || raw.picture.length > 16) return "Mỗi thẻ cần từ tiếng Anh, nghĩa tiếng Việt và hình minh họa tối đa 16 ký tự.";
+    cards.push({ english: raw.english.trim(), vietnamese: raw.vietnamese.trim(), picture: raw.picture.trim() || "📚" });
+  }
+  return cards;
+}
+
+export function parseFlashcardDeck(value: unknown): FlashcardDeck | string {
+  if (!value || typeof value !== "object") return "Bộ thẻ không hợp lệ.";
+  const raw = value as Record<string, unknown>;
+  if (typeof raw.id !== "string" || !raw.id.trim() || raw.id.length > 100 ||
+      typeof raw.title !== "string" || !raw.title.trim() || raw.title.length > 100 ||
+      typeof raw.icon !== "string" || !raw.icon.trim() || raw.icon.length > 16) return "Tên hoặc mã bộ thẻ không hợp lệ.";
+  const cards = parseFlashcards(raw.cards);
+  return typeof cards === "string" ? cards : { id: raw.id, title: raw.title.trim(), icon: raw.icon.trim(), cards };
+}
+
 export const FLASHCARD_DECKS: FlashcardDeck[] = [
   {
     id: "animals", title: "Con vật", icon: "🐾",

@@ -35,6 +35,14 @@ test("AI routes validate requests and return teacher questions and student help"
     assert.equal(data.questions.length, 2);
     assert.equal(data.questions[1].answer, "3");
     assert.equal((await post({ ...create, topic: "mock-invalid" }, "test-pin")).status, 502);
+    const flashcards = { kind: "flashcards", topic: "con vật", level: "Tiểu học", count: 2 };
+    assert.equal((await post(flashcards)).status, 401);
+    assert.equal((await post({ ...flashcards, count: 11 }, "test-pin")).status, 400);
+    const cardResult = await post(flashcards, "test-pin");
+    const cardData = await cardResult.json();
+    assert.equal(cardResult.status, 200, JSON.stringify(cardData));
+    assert.deepEqual(cardData.cards[0], { english: "cat", vietnamese: "con mèo", picture: "🐱" });
+    assert.equal((await post({ ...flashcards, topic: "mock-invalid" }, "test-pin")).status, 502);
     assert.equal((await post({ kind: "help", question: "" })).status, 400);
     assert.equal((await post({ kind: "help", question: "mock-quota" })).status, 429);
     assert.equal((await post({ kind: "help", question: "mock-blocked" })).status, 502);

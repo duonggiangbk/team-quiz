@@ -10,7 +10,12 @@ globalThis.fetch = async (input, init) => {
     if (inputText.includes("mock-quota")) return Response.json({}, { status: 429 });
     if (inputText.includes("mock-blocked")) return Response.json({ candidates: [{ finishReason: "SAFETY" }] });
     if (inputText.includes("mock-invalid")) return Response.json({ candidates: [{ finishReason: "STOP", content: { parts: [{ text: "[]" }] } }] });
-    const text = body.generationConfig.responseMimeType
+    const text = body.generationConfig.responseSchema?.items?.properties?.english
+      ? JSON.stringify([
+        { english: "cat", vietnamese: "con mèo", picture: "🐱" },
+        { english: "dog", vietnamese: "con chó", picture: "🐶" },
+      ])
+      : body.generationConfig.responseMimeType
       ? JSON.stringify([
         { prompt: "1 + 1 bằng mấy?", options: ["2", "1", "3", "4"], correctIndex: 0 },
         { prompt: "2 + 1 bằng mấy?", options: ["1", "2", "3", "4"], correctIndex: 2 },

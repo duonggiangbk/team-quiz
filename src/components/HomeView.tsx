@@ -85,8 +85,8 @@ export default function HomeView() {
     <main className="mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6">
       <header className="mb-8 rounded-3xl border-4 border-white bg-gradient-to-r from-sky-100 via-indigo-100 to-pink-100 p-6 text-center shadow-sm">
         <p className="mb-2 text-3xl" aria-hidden="true">🌟 🎈 🧩</p>
-        <h1 className="text-4xl font-extrabold text-indigo-800 sm:text-5xl">Ô Số Đồng Đội</h1>
-        <p className="mt-2 text-lg font-semibold text-indigo-700">Cùng chọn ô, khám phá và ghi điểm nhé!</p>
+        <h1 className="text-4xl font-extrabold text-indigo-800 sm:text-5xl">Team Quiz – Vui học mỗi ngày</h1>
+        <p className="mt-2 text-lg font-semibold text-indigo-700">Cùng khám phá trò chơi, thẻ học và những điều mới nhé!</p>
       </header>
       <nav aria-label="Nhóm tính năng" className="mb-6 flex flex-wrap gap-2 rounded-2xl bg-white p-3 shadow-sm">
         {FEATURES.map((item) => (

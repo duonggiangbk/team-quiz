@@ -8,7 +8,9 @@ Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công c�
 
 ## Flashcard tiếng Anh
 
-Chọn **Flashcard tiếng Anh** ở trang chủ để học từ vựng theo các chủ đề con vật, trái cây, màu sắc và số đếm. Chạm thẻ để xem nghĩa, dùng nút trước/sau để đổi thẻ và nghe phát âm bằng giọng đọc của trình duyệt. Tính năng phát âm phụ thuộc trình duyệt và giọng tiếng Anh trên thiết bị. Các bộ thẻ có sẵn; vị trí thẻ không được lưu khi rời trang.
+Chọn **Flashcard tiếng Anh** ở trang chủ để học từ vựng theo các chủ đề con vật, trái cây, màu sắc và số đếm. Chạm thẻ để xem nghĩa, dùng nút trước/sau để đổi thẻ và nghe phát âm bằng giọng đọc của trình duyệt. Tính năng phát âm phụ thuộc trình duyệt và giọng tiếng Anh trên thiết bị; vị trí thẻ không được lưu khi rời trang.
+
+Chọn **Tạo bộ thẻ mới** để tự nhập tiếng Anh, tiếng Việt và emoji, hoặc nhập chủ đề, độ tuổi và số thẻ để AI tạo bản nháp. Kiểm tra, chỉnh sửa rồi lưu; có thể sửa hoặc xóa các bộ tự tạo. Mỗi bộ tối đa 30 thẻ, tối đa 100 bộ. Các bộ tự tạo chỉ lưu trên trình duyệt hiện tại, không đồng bộ qua tài khoản hay thiết bị khác và có thể mất khi xóa dữ liệu trình duyệt. Tạo bằng AI cần `GEMINI_API_KEY`, Upstash và `EDIT_PIN` như phần Trợ lý AI; chủ đề được gửi đến Google nên không nhập thông tin cá nhân.
 
 ## Câu hỏi có hình
 
