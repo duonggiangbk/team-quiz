@@ -3,7 +3,7 @@ export interface GameCatalogItem {
   title: string;
   description: string;
   icon: string;
-  status: "tile" | "flashcards" | "planned";
+  status: "tile" | "flashcards" | "crossword" | "matching" | "zombies" | "planned";
 }
 
 export const GAME_CATALOG: GameCatalogItem[] = [
@@ -14,7 +14,7 @@ export const GAME_CATALOG: GameCatalogItem[] = [
   { id: "fruit-bubbles", title: "Chém hoa quả – Bắt bong bóng", description: "Chọn đáp án qua trò chơi tương tác.", icon: "🍉", status: "planned" },
   { id: "star-race", title: "Cuộc đua ngôi sao", description: "Thi trả lời câu hỏi để giành sao.", icon: "⭐", status: "planned" },
   { id: "mines", title: "Dò mìn", description: "Chọn đáp án và tránh ô có mìn.", icon: "💣", status: "planned" },
-  { id: "zombies", title: "Chặn Zombie", description: "Trả lời câu hỏi để bảo vệ hàng rào.", icon: "🧟", status: "planned" },
+  { id: "zombies", title: "Chặn Zombie", description: "Trả lời câu hỏi để bảo vệ hàng rào.", icon: "🧟", status: "zombies" },
   { id: "exercise-abc", title: "Thể dục ABC", description: "Vừa vận động vừa trả lời câu hỏi.", icon: "🤸", status: "planned" },
   { id: "puzzle-reveal", title: "Trò chơi lật mảnh ghép", description: "Trả lời câu hỏi để mở bức tranh.", icon: "🖼️", status: "planned" },
   { id: "knowledge-train", title: "Đoàn tàu tri thức", description: "Sắp xếp các toa tàu theo đáp án.", icon: "🚂", status: "planned" },
@@ -23,8 +23,8 @@ export const GAME_CATALOG: GameCatalogItem[] = [
   { id: "paper-mode", title: "Chế độ giấy", description: "Trả lời trắc nghiệm bằng thẻ giấy.", icon: "📄", status: "planned" },
   { id: "rhythm-quiz", title: "Trắc nghiệm theo nhịp độ", description: "Trò chơi câu hỏi theo nhịp độ lớp học.", icon: "⏱️", status: "planned" },
   { id: "flying-words", title: "Từ ngữ biết bay", description: "Chọn và sắp xếp từ thành câu.", icon: "🔤", status: "planned" },
-  { id: "matching", title: "Kéo thả nối ý", description: "Ghép các ý tương ứng với nhau.", icon: "🧷", status: "planned" },
-  { id: "crossword", title: "Ô chữ khóa bí mật", description: "Giải câu hỏi để khám phá ô chữ.", icon: "🔠", status: "planned" },
+  { id: "matching", title: "Kéo thả nối ý", description: "Ghép các ý tương ứng với nhau.", icon: "🧷", status: "matching" },
+  { id: "crossword", title: "Ô chữ khóa bí mật", description: "Giải câu hỏi để khám phá ô chữ.", icon: "🔠", status: "crossword" },
   { id: "flashcards", title: "Thẻ lật tiếng Anh", description: "Học từ tiếng Anh bằng thẻ lật có sẵn.", icon: "🃏", status: "flashcards" },
   { id: "mind-map", title: "Sơ đồ tư duy", description: "Sắp xếp và ôn tập ý chính của bài học.", icon: "💡", status: "planned" },
   { id: "gallery", title: "Phòng tranh 3D", description: "Khám phá tranh trong không gian 3D.", icon: "🎨", status: "planned" },

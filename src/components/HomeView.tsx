@@ -114,6 +114,12 @@ export default function HomeView() {
                 <button type="button" onClick={() => setGameSelected(true)} className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chọn bộ câu hỏi</button>
               ) : item.status === "flashcards" ? (
                 <Link href="/flashcards" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
+              ) : item.status === "crossword" ? (
+                <Link href="/crossword" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi ô chữ</Link>
+              ) : item.status === "matching" ? (
+                <Link href="/matching" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi nối ý</Link>
+              ) : item.status === "zombies" ? (
+                <Link href="/zombies" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi chặn zombie</Link>
               ) : (
                 <span className="mt-4 self-start rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">Chưa triển khai</span>
               )}

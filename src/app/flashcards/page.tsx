@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import FlashcardEditor from "@/components/FlashcardEditor";
 import { FLASHCARD_DECKS, parseFlashcardDeck, type FlashcardDeck } from "@/lib/flashcards";
@@ -15,6 +16,7 @@ export default function FlashcardsPage() {
   const [cardIndex, setCardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [speechError, setSpeechError] = useState("");
+  const [failedImage, setFailedImage] = useState("");
   const decks = [...FLASHCARD_DECKS, ...customDecks];
   const deck = decks.find((item) => item.id === selectedId) ?? FLASHCARD_DECKS[0];
   const card = deck.cards[cardIndex];
@@ -139,11 +141,14 @@ export default function FlashcardsPage() {
         <button type="button" onClick={() => setFlipped(!flipped)}
           aria-label={flipped ? `Nghĩa: ${card.vietnamese}. Lật về tiếng Anh` : `Từ tiếng Anh: ${card.english}. Lật xem nghĩa`}
           className="flex min-h-64 w-full flex-col items-center justify-center gap-4 rounded-3xl border-4 border-indigo-100 bg-gradient-to-br from-sky-50 to-pink-50 p-6 text-center hover:border-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-          <span className="text-7xl" aria-hidden="true">{card.picture}</span>
+          {card.image && card.image !== failedImage
+            ? <Image src={card.image} alt="" width={320} height={200} unoptimized className="max-h-48 w-auto max-w-full rounded-xl object-contain" onError={() => setFailedImage(card.image ?? "")} />
+            : <span className="text-7xl" aria-hidden="true">{card.picture}</span>}
           <span className="text-sm font-bold text-indigo-600">{flipped ? "Tiếng Việt" : "Tiếng Anh"}</span>
           <span lang={flipped ? "vi" : "en"} className="text-4xl font-extrabold text-indigo-900">{flipped ? card.vietnamese : card.english}</span>
           <span className="text-sm text-slate-600">{flipped ? "Chạm để xem từ tiếng Anh" : "Chạm để xem nghĩa"}</span>
         </button>
+        {card.image && card.image === failedImage && <p role="status" className="mt-2 text-center text-sm text-amber-800">Không tải được hình ảnh. Hãy kiểm tra lại liên kết.</p>}
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={() => moveCard(cardIndex - 1)} disabled={cardIndex === 0} className="rounded-xl bg-slate-100 px-4 py-3 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40">← Thẻ trước</button>
           <button type="button" onClick={speak} className="rounded-xl bg-violet-600 px-4 py-3 font-bold text-white hover:bg-violet-700">🔊 Nghe phát âm</button>

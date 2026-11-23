@@ -4,13 +4,33 @@ Trò chơi đố vui chia đội cho lớp học: chọn bộ câu hỏi, chia �
 
 Có các bộ hỗ trợ giáo viên dạy tiếng Anh cho trẻ, thuộc hai chủ đề "Anh văn mầm non" và "Anh văn tiểu học".
 
-Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công cụ AI và flashcard. Chọn **Trò chơi → Ô Số Đồng Đội → Chọn bộ câu hỏi** để xem danh sách bộ câu hỏi hiện có và chơi; danh sách này cũng có trong **Kho câu hỏi** để quản lý. Thẻ lật tiếng Anh cũng sử dụng được từ danh mục trò chơi; các trò khác trong danh mục được ghi rõ là chưa triển khai. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
+Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công cụ AI và flashcard. Chọn **Trò chơi → Ô Số Đồng Đội → Chọn bộ câu hỏi** để xem danh sách bộ câu hỏi hiện có và chơi; danh sách này cũng có trong **Kho câu hỏi** để quản lý. Chặn Zombie, Kéo thả nối ý, Ô chữ khóa bí mật và Thẻ lật tiếng Anh cũng sử dụng được từ danh mục trò chơi; các trò khác trong danh mục được ghi rõ là chưa triển khai. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
+
+## Chặn Zombie
+
+Chọn **Trò chơi → Chặn Zombie**, chọn một bộ trong kho và xem trước câu hỏi, lựa chọn trước khi chơi. Câu trắc nghiệm giữ nguyên lựa chọn; câu chỉ có đáp án được tạo thêm tối đa ba lựa chọn từ các đáp án khác trong cùng bộ. Giáo viên cần kiểm tra vì lựa chọn tự tạo có thể không phù hợp hoặc có nhiều đáp án đúng. Câu không có đủ dữ liệu hoặc không có đáp án khác để tạo lựa chọn sẽ bị bỏ qua; có thể sửa bộ trong kho.
+
+Mỗi câu bắt đầu với 30 giây. Chọn sai tăng tốc zombie thêm 50% tốc độ ban đầu và có thể chọn lại đáp án khác; chọn đúng chuyển sang câu tiếp theo. Nếu zombie đến hàng rào, ván kết thúc. Có thể tạm dừng và chơi lại; khi chuyển sang ứng dụng khác, ván tự tạm dừng. Tiến độ ván không được lưu khi rời trang.
+
+## Kéo thả nối ý
+
+Chọn **Trò chơi → Kéo thả nối ý** để chơi bài mẫu hoặc tạo bộ gồm 2–8 cặp. Nhập các cặp tương ứng hoặc sao chép câu hỏi, đáp án và hình minh họa từ kho rồi chỉnh sửa. Các ý trong cùng một cột phải khác nhau để mỗi cặp có một đáp án rõ ràng. Bộ tự tạo có thể sửa, xóa; tối đa 100 bộ được lưu trên trình duyệt này, không đồng bộ giữa thiết bị và có thể mất khi xóa dữ liệu trình duyệt.
+
+Trong ván chơi, kéo từ ý bên trái sang bên phải, hoặc chạm/chọn lần lượt hai ý bằng điện thoại hay bàn phím. Mỗi ý chỉ nối với một ý khác; chọn lại để đổi hoặc bỏ nối. **Kiểm tra** cho biết số cặp đúng và đánh dấu từng cặp đã nối, kể cả khi chưa nối hết; **Chơi lại** xóa các nối và xáo trộn cột phải. Tiến độ không được lưu khi rời ván.
+
+## Ô chữ khóa bí mật
+
+Chọn **Trò chơi → Ô chữ khóa bí mật** để chơi bài mẫu hoặc tạo ô chữ. Nhập tên và từ khóa 2–12 chữ cái, rồi tự nhập gợi ý và đáp án từng hàng hoặc sao chép câu hỏi từ kho; mỗi hàng cần chọn vị trí chữ giao với từ khóa. Có thể chỉnh câu và đáp án đã sao chép, kể cả khi đáp án gốc không phù hợp. Hình ảnh của câu hỏi trong kho được sao chép theo. Đáp án dùng tối đa 20 chữ cái; dấu tiếng Việt, khoảng trắng và dấu gạch nối được bỏ khi xếp ô và kiểm tra câu trả lời.
+
+Khi chơi, chọn hàng và trả lời để mở, hoặc dùng nút mở đáp án. Có thể đoán hoặc mở từ khóa bất cứ lúc nào. Giáo viên điều khiển trò chơi, không có tính điểm tự động; tiến độ không được lưu khi rời ván. Tối đa 100 ô chữ tự tạo được lưu trên trình duyệt hiện tại, không đồng bộ qua tài khoản hay thiết bị và có thể mất khi xóa dữ liệu trình duyệt. Sửa hoặc xóa chỉ áp dụng cho ô chữ tự tạo.
 
 ## Flashcard tiếng Anh
 
 Chọn **Flashcard tiếng Anh** ở trang chủ để học từ vựng theo các chủ đề con vật, trái cây, màu sắc và số đếm. Chạm thẻ để xem nghĩa, dùng nút trước/sau để đổi thẻ và nghe phát âm bằng giọng đọc của trình duyệt. Tính năng phát âm phụ thuộc trình duyệt và giọng tiếng Anh trên thiết bị; vị trí thẻ không được lưu khi rời trang.
 
 Chọn **Tạo bộ thẻ mới** để tự nhập tiếng Anh, tiếng Việt và emoji, hoặc nhập chủ đề, độ tuổi và số thẻ để AI tạo bản nháp. Kiểm tra, chỉnh sửa rồi lưu; có thể sửa hoặc xóa các bộ tự tạo. Mỗi bộ tối đa 30 thẻ, tối đa 100 bộ. Các bộ tự tạo chỉ lưu trên trình duyệt hiện tại, không đồng bộ qua tài khoản hay thiết bị khác và có thể mất khi xóa dữ liệu trình duyệt. Tạo bằng AI cần `GEMINI_API_KEY`, Upstash và `EDIT_PIN` như phần Trợ lý AI; chủ đề được gửi đến Google nên không nhập thông tin cá nhân.
+
+Khi tạo hoặc sửa thẻ, có thể thêm ảnh bằng liên kết HTTP(S) hoặc chọn ảnh PNG, JPEG, GIF, WebP từ máy (tối đa 80 KB mỗi ảnh). Ảnh tải lên được lưu cùng bộ thẻ trên trình duyệt và chiếm dung lượng lưu trữ; liên kết ảnh cần truy cập được trên thiết bị. Nếu không có ảnh, thẻ hiển thị emoji.
 
 ## Câu hỏi có hình
 

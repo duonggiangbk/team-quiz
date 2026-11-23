@@ -1,7 +1,10 @@
+import { isValidImage } from "./validate.ts";
+
 export interface Flashcard {
   english: string;
   vietnamese: string;
   picture: string;
+  image?: string;
 }
 
 export interface FlashcardDeck {
@@ -24,7 +27,10 @@ export function parseFlashcards(value: unknown, expectedCount?: number): Flashca
     if (typeof raw.english !== "string" || !raw.english.trim() || raw.english.length > 100 ||
         typeof raw.vietnamese !== "string" || !raw.vietnamese.trim() || raw.vietnamese.length > 100 ||
         typeof raw.picture !== "string" || raw.picture.length > 16) return "Mỗi thẻ cần từ tiếng Anh, nghĩa tiếng Việt và hình minh họa tối đa 16 ký tự.";
-    cards.push({ english: raw.english.trim(), vietnamese: raw.vietnamese.trim(), picture: raw.picture.trim() || "📚" });
+    if (raw.image !== undefined && (typeof raw.image !== "string" || !isValidImage(raw.image))) {
+      return "Hình ảnh không hợp lệ. Hãy dùng liên kết http(s) hoặc ảnh PNG, JPEG, GIF, WebP.";
+    }
+    cards.push({ english: raw.english.trim(), vietnamese: raw.vietnamese.trim(), picture: raw.picture.trim() || "📚", ...(typeof raw.image === "string" ? { image: raw.image } : {}) });
   }
   return cards;
 }

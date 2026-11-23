@@ -12,6 +12,17 @@ test("flashcard topics contain unique, complete and usable cards", () => {
   }
 });
 
+test("flashcards preserve valid images and reject invalid image references", () => {
+  const base = { english: "cat", vietnamese: "mèo", picture: "🐱" };
+  for (const image of ["https://example.com/cat.png", "data:image/png;base64,YQ==", "/images/cat.svg"]) {
+    assert.deepEqual(parseFlashcards([{ ...base, image }]), [{ ...base, image }]);
+    assert.deepEqual(parseFlashcardDeck({ id: "my-deck", title: "Test", icon: "🃏", cards: [{ ...base, image }] }).cards[0], { ...base, image });
+  }
+  for (const image of ["javascript:alert(1)", "data:image/svg+xml;base64,YQ==", "https://x.test/" + "a".repeat(110000), 3]) {
+    assert.equal(typeof parseFlashcards([{ ...base, image }]), "string");
+  }
+});
+
 test("validates manual and AI flashcards without accepting incomplete decks", () => {
   const cards = [{ english: " cat ", vietnamese: " mèo ", picture: "" }];
   assert.deepEqual(parseFlashcards(cards, 1), [{ english: "cat", vietnamese: "mèo", picture: "📚" }]);
