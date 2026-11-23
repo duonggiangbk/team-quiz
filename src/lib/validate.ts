@@ -1,7 +1,22 @@
 import type { Question, QuestionSet } from "./types";
 
 export const MAX_BODY_BYTES = 200_000;
+export const MAX_IMAGE_FILE_BYTES = 80_000;
+export const MAX_IMAGE_LENGTH = 110_000;
 const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+const IMAGE_DATA_RE = /^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/;
+
+export function isValidImage(value: string): boolean {
+  if (!value || value.length > MAX_IMAGE_LENGTH) return false;
+  if (IMAGE_DATA_RE.test(value)) return true;
+  if (/^\/(?!\/)[^\s\\]*$/.test(value)) return true;
+  try {
+    const url = new URL(value);
+    return (url.protocol === "https:" || url.protocol === "http:") && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
 
 function str(value: unknown, max: number): string | null {
   return typeof value === "string" && value.length <= max ? value : null;
@@ -34,10 +49,27 @@ export function parseSet(input: unknown): QuestionSet | string {
     const answer = str(item.answer, 500);
     const points = item.points;
     if (!qid || prompt === null || answer === null) return "Câu hỏi quá dài hoặc thiếu dữ liệu.";
+    const image = item.image;
+    if (image !== undefined && (typeof image !== "string" || !isValidImage(image))) {
+      return "Hình ảnh không hợp lệ. Hãy dùng liên kết http(s) hoặc ảnh PNG, JPEG, GIF, WebP.";
+    }
     if (typeof points !== "number" || !Number.isInteger(points) || points < 0 || points > 1000) {
       return "Điểm câu hỏi không hợp lệ.";
     }
-    questions.push({ id: qid, prompt, answer, points });
+    const options = item.options;
+    const correctIndex = item.correctIndex;
+    if (options !== undefined || correctIndex !== undefined) {
+      if (!Array.isArray(options) || options.length < 2 || options.length > 4 ||
+          options.some((option) => typeof option !== "string" || !option.trim() || option.length > 500) ||
+          new Set(options.map((option: string) => option.trim().toLocaleLowerCase())).size !== options.length ||
+          typeof correctIndex !== "number" || !Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= options.length) {
+        return "Câu trắc nghiệm cần 2–4 lựa chọn khác nhau và một đáp án đúng.";
+      }
+      if (answer !== options[correctIndex]) return "Đáp án không khớp với lựa chọn đúng.";
+      questions.push({ id: qid, prompt, answer, points, options, correctIndex, ...(image ? { image } : {}) });
+    } else {
+      questions.push({ id: qid, prompt, answer, points, ...(image ? { image } : {}) });
+    }
   }
   return { id, title, description, questions, updatedAt: Date.now(), ...(category ? { category } : {}) };
 }

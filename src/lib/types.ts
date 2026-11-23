@@ -3,6 +3,33 @@ export interface Question {
   prompt: string;
   answer: string;
   points: number;
+  image?: string;
+  options?: string[];
+  correctIndex?: number;
+}
+
+export interface Assignment {
+  code: string;
+  title: string;
+  createdAt: number;
+  expiresAt: number;
+  questions: Question[];
+}
+
+export interface Submission {
+  id: string;
+  name: string;
+  submittedAt: number;
+  answers: number[];
+  score: number;
+  total: number;
+}
+
+export interface StudentAssignment {
+  code: string;
+  title: string;
+  expiresAt: number;
+  questions: Pick<Question, "id" | "prompt" | "image" | "options">[];
 }
 
 export interface QuestionSet {

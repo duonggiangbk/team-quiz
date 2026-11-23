@@ -1,5 +1,6 @@
 import { BUILTIN_SETS } from "./builtinSets";
 import type { GameState, Question, QuestionSet } from "./types";
+import { MAX_BODY_BYTES, parseSet } from "./validate";
 
 const SETS_KEY = "team-quiz:sets";
 const GAME_KEY = "team-quiz:game";
@@ -102,7 +103,7 @@ function writeHidden(hidden: Set<string>) {
   write(HIDDEN_KEY, [...hidden]);
 }
 
-async function errorMessage(res: Response): Promise<string> {
+export async function errorMessage(res: Response): Promise<string> {
   try {
     const body = (await res.json()) as { error?: string };
     if (body.error) return body.error;
@@ -112,7 +113,7 @@ async function errorMessage(res: Response): Promise<string> {
   return `Lỗi máy chủ (${res.status}).`;
 }
 
-async function writeRequest(url: string, init: RequestInit): Promise<Response> {
+export async function writeRequest(url: string, init: RequestInit): Promise<Response> {
   const send = (pin: string | null) =>
     fetch(url, {
       ...init,
@@ -212,6 +213,11 @@ export async function fetchSet(id: string): Promise<QuestionSet | null> {
 
 export async function upsertSet(set: QuestionSet): Promise<void> {
   const value = { ...set, updatedAt: Date.now() };
+  if (new TextEncoder().encode(JSON.stringify(value)).length > MAX_BODY_BYTES) {
+    throw new Error("Bộ câu hỏi quá lớn (tối đa 200 KB). Hãy dùng liên kết ảnh hoặc giảm số ảnh tải lên.");
+  }
+  const parsed = parseSet(value);
+  if (typeof parsed === "string") throw new Error(parsed);
   if (await isCloud()) {
     let res: Response;
     try {

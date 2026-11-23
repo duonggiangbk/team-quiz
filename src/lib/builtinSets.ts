@@ -18,6 +18,19 @@ function build(slug: string, category: string, title: string, description: strin
 export const CATEGORIES = ["Toán", "Tiếng Anh", PRESCHOOL, PRIMARY, "Khoa học", "Địa lý", "Lịch sử", "Tiếng Việt", "Đời sống", "Giải trí"] as const;
 
 export const BUILTIN_SETS: QuestionSet[] = [
+  {
+    id: "builtin-picture-fun",
+    category: PRESCHOOL,
+    title: "Bé vui cùng hình ảnh",
+    description: "Nhìn tranh, gọi tên và trả lời những câu hỏi thật vui!",
+    updatedAt: 0,
+    questions: [
+      { id: "picture-apple", prompt: "Đây là quả gì?", answer: "Quả táo (Apple)", points: 10, image: "/images/apple.svg" },
+      { id: "picture-sun", prompt: "Ai tỏa nắng trên bầu trời?", answer: "Mặt trời (Sun)", points: 10, image: "/images/sun.svg" },
+      { id: "picture-cat", prompt: "Con vật nào kêu meo meo?", answer: "Con mèo (Cat)", points: 10, image: "/images/cat.svg" },
+      { id: "picture-fish", prompt: "Con vật nào đang bơi dưới nước?", answer: "Con cá (Fish)", points: 10, image: "/images/fish.svg" },
+    ],
+  },
   build("math-add-sub", "Toán", "Cộng trừ trong phạm vi 100", "Tính nhẩm nhanh cho học sinh tiểu học.", [
     ["25 + 17 = ?", "42"],
     ["63 − 28 = ?", "35"],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import QuestionImage from "@/components/QuestionImage";
 import { POWER_UPS } from "@/lib/game";
 import type { Team, Tile } from "@/lib/types";
 
@@ -18,8 +19,8 @@ export default function QuestionModal({ tile, teams, current, onAnswer, onPowerU
   const team = teams[current];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-indigo-950/70 p-3 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-label={tile.kind === "question" ? `Câu hỏi ô số ${tile.number}` : `Ô đặc biệt ${tile.number}`} className="max-h-full w-full max-w-2xl overflow-y-auto rounded-3xl border-4 border-amber-200 bg-white p-5 shadow-2xl sm:p-8">
         <div className="mb-4 flex items-center justify-between">
           <span className="rounded-full px-3 py-1 text-sm font-bold text-white" style={{ backgroundColor: team.color }}>
             {team.name}
@@ -30,7 +31,12 @@ export default function QuestionModal({ tile, teams, current, onAnswer, onPowerU
         {tile.kind === "question" ? (
           <>
             <p className="mb-2 text-sm font-semibold text-indigo-500">{tile.question.points} điểm</p>
-            <h2 className="mb-6 whitespace-pre-wrap text-3xl font-bold text-slate-800">{tile.question.prompt}</h2>
+            <h2 className="mb-4 whitespace-pre-wrap text-2xl font-extrabold text-indigo-950 sm:text-3xl">{tile.question.prompt}</h2>
+            {tile.question.image && (
+              <div className="mb-5">
+                <QuestionImage src={tile.question.image} alt="Hình minh họa cho câu hỏi" />
+              </div>
+            )}
             {revealed ? (
               <div className="mb-6 rounded-2xl bg-emerald-50 p-4 text-xl font-semibold text-emerald-800">
                 Đáp án: {tile.question.answer || "(không có)"}

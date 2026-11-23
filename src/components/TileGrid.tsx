@@ -15,7 +15,7 @@ export default function TileGrid({ tiles, onPick }: { tiles: Tile[]; onPick: (ti
             "aspect-square rounded-2xl text-3xl font-extrabold shadow transition " +
             (tile.used
               ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-              : "bg-white text-indigo-700 hover:scale-105 hover:bg-indigo-50 active:scale-95")
+              : "border-2 border-indigo-100 bg-white text-indigo-700 hover:scale-105 hover:border-amber-300 hover:bg-amber-50 active:scale-95")
           }
           aria-label={tile.used ? `Ô ${tile.number} đã dùng` : `Mở ô ${tile.number}`}
         >

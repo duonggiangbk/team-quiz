@@ -67,10 +67,15 @@ export default function HomeView() {
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 p-6">
-      <header className="mb-8 text-center">
-        <h1 className="text-5xl font-extrabold text-indigo-800">🔢 Ô Số Đồng Đội</h1>
-        <p className="mt-2 text-lg text-indigo-600">Trò chơi đố vui theo đội cho lớp học – chọn ô, trả lời, ghi điểm!</p>
+      <header className="mb-8 rounded-3xl border-4 border-white bg-gradient-to-r from-sky-100 via-indigo-100 to-pink-100 p-6 text-center shadow-sm">
+        <p className="mb-2 text-3xl" aria-hidden="true">🌟 🎈 🧩</p>
+        <h1 className="text-4xl font-extrabold text-indigo-800 sm:text-5xl">Ô Số Đồng Đội</h1>
+        <p className="mt-2 text-lg font-semibold text-indigo-700">Cùng chọn ô, khám phá và ghi điểm nhé!</p>
       </header>
+      <nav aria-label="Công cụ học tập" className="mb-6 flex flex-wrap gap-3">
+        <Link href="/assignments" className="rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">📋 Giao bài &amp; báo cáo</Link>
+        <Link href="/join" className="rounded-2xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">🎒 Nhập mã làm bài</Link>
+      </nav>
 
       {game && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-100 p-4">
@@ -161,6 +166,7 @@ export default function HomeView() {
               {set.description && <p className="mt-1 text-sm text-slate-500">{set.description}</p>}
               <p className="mt-auto pt-2 text-sm font-semibold text-indigo-500">
                 {set.questions.filter((q) => q.prompt.trim()).length} câu hỏi
+                {set.questions.some((q) => q.image) && " · 🖼️ Có hình ảnh"}
               </p>
               <div className="mt-4 flex gap-2">
                 <Link

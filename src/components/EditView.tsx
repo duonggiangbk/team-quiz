@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import QuestionImage from "@/components/QuestionImage";
 import { fetchSet, newId, newQuestion, upsertSet } from "@/lib/storage";
 import type { Question, QuestionSet } from "@/lib/types";
+import { isValidImage, MAX_IMAGE_FILE_BYTES } from "@/lib/validate";
 
 function blankSet(): QuestionSet {
   return { id: newId(), title: "", description: "", questions: [newQuestion(), newQuestion(), newQuestion()], updatedAt: Date.now() };
@@ -37,9 +39,35 @@ function Editor({ initial }: { initial: QuestionSet }) {
   const [set, setSet] = useState<QuestionSet>(initial);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [imagesLoading, setImagesLoading] = useState(0);
 
   function updateQuestion(id: string, patch: Partial<Question>) {
     setSet((s) => ({ ...s, questions: s.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) }));
+  }
+
+  function uploadImage(id: string, file: File | undefined) {
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/gif", "image/webp"].includes(file.type)) {
+      setError("Hãy chọn ảnh PNG, JPEG, GIF hoặc WebP.");
+      return;
+    }
+    if (file.size > MAX_IMAGE_FILE_BYTES) {
+      setError("Ảnh tải lên phải nhỏ hơn 80 KB. Bạn cũng có thể dùng liên kết ảnh.");
+      return;
+    }
+    const reader = new FileReader();
+    setImagesLoading((count) => count + 1);
+    reader.onload = () => {
+      if (typeof reader.result !== "string" || !isValidImage(reader.result)) {
+        setError("Không đọc được hình ảnh. Hãy chọn một ảnh khác.");
+        return;
+      }
+      updateQuestion(id, { image: reader.result });
+      setError("");
+    };
+    reader.onerror = () => setError("Không đọc được hình ảnh. Hãy thử lại.");
+    reader.onloadend = () => setImagesLoading((count) => count - 1);
+    reader.readAsDataURL(file);
   }
 
   async function save() {
@@ -89,7 +117,7 @@ function Editor({ initial }: { initial: QuestionSet }) {
 
       <ol className="space-y-4">
         {set.questions.map((q, i) => (
-          <li key={q.id} className="rounded-2xl bg-white p-5 shadow">
+          <li key={q.id} className="rounded-3xl border-2 border-indigo-100 bg-white p-5 shadow">
             <div className="mb-2 flex items-center justify-between">
               <span className="font-bold text-indigo-700">Câu {i + 1}</span>
               <button
@@ -108,10 +136,83 @@ function Editor({ initial }: { initial: QuestionSet }) {
               placeholder="Nội dung câu hỏi"
               aria-label={`Câu hỏi ${i + 1}`}
             />
+            <label className="mb-3 flex items-center gap-2 font-semibold text-indigo-700">
+              <input
+                type="checkbox"
+                checked={!!q.options}
+                onChange={(e) => updateQuestion(q.id, e.target.checked
+                  ? { options: [q.answer, ""], correctIndex: 0 }
+                  : { options: undefined, correctIndex: undefined })}
+              />
+              Câu trắc nghiệm để giao bài
+            </label>
+            {q.options && (
+              <fieldset className="mb-3 space-y-2 rounded-2xl bg-indigo-50 p-4">
+                <legend className="font-bold text-indigo-800">Chọn một đáp án đúng</legend>
+                {q.options.map((option, index) => (
+                  <label key={index} className="flex items-center gap-2">
+                    <input type="radio" name={`correct-${q.id}`} checked={q.correctIndex === index}
+                      onChange={() => updateQuestion(q.id, { correctIndex: index, answer: q.options![index] })} />
+                    <span className="font-bold text-indigo-700">{String.fromCharCode(65 + index)}</span>
+                    <input value={option} aria-label={`Lựa chọn ${index + 1} câu ${i + 1}`}
+                      onChange={(e) => {
+                        const options = q.options!.map((value, j) => j === index ? e.target.value : value);
+                        updateQuestion(q.id, { options, ...(q.correctIndex === index ? { answer: e.target.value } : {}) });
+                      }}
+                      className="w-full rounded-xl border border-indigo-200 bg-white px-3 py-2" />
+                    {q.options!.length > 2 && <button type="button" aria-label={`Xóa lựa chọn ${index + 1} câu ${i + 1}`}
+                      onClick={() => {
+                        const options = q.options!.filter((_, j) => j !== index);
+                        const correctIndex = q.correctIndex === index ? 0 : (q.correctIndex ?? 0) > index ? (q.correctIndex ?? 0) - 1 : q.correctIndex ?? 0;
+                        updateQuestion(q.id, { options, correctIndex, answer: options[correctIndex] });
+                      }}
+                      className="font-bold text-rose-700">Xóa</button>}
+                  </label>
+                ))}
+                {q.options.length < 4 && <button type="button" onClick={() => updateQuestion(q.id, { options: [...q.options!, ""] })}
+                  className="font-semibold text-indigo-700 hover:underline">+ Thêm lựa chọn</button>}
+              </fieldset>
+            )}
+            <div className="mb-3 space-y-3 rounded-2xl bg-sky-50 p-4">
+              <label className="block">
+                <span className="font-bold text-sky-800">🖼️ Hình minh họa (tùy chọn)</span>
+                <input
+                  type="url"
+                  value={q.image?.startsWith("data:") ? "" : q.image ?? ""}
+                  onChange={(e) => updateQuestion(q.id, { image: e.target.value || undefined })}
+                  className="mt-2 w-full rounded-xl border border-sky-200 bg-white px-3 py-2"
+                  placeholder="Dán liên kết https://…"
+                  aria-label={`Liên kết hình ảnh câu ${i + 1}`}
+                />
+              </label>
+              <label className="block text-sm font-semibold text-sky-800">
+                Hoặc chọn ảnh từ máy (PNG, JPEG, GIF, WebP; tối đa 80 KB)
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  className="mt-2 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-sky-200 file:px-4 file:py-2 file:font-bold file:text-sky-900"
+                  onChange={(e) => {
+                    uploadImage(q.id, e.target.files?.[0]);
+                    e.target.value = "";
+                  }}
+                  aria-label={`Chọn hình ảnh câu ${i + 1}`}
+                />
+              </label>
+              {q.image && isValidImage(q.image) && (
+                <>
+                  <QuestionImage src={q.image} alt={`Hình minh họa câu ${i + 1}`} />
+                  <button type="button" onClick={() => updateQuestion(q.id, { image: undefined })} className="font-semibold text-rose-700 hover:underline">
+                    Xóa hình
+                  </button>
+                </>
+              )}
+              {q.image && !isValidImage(q.image) && <p className="text-sm font-semibold text-rose-700">Liên kết hình ảnh chưa hợp lệ.</p>}
+            </div>
             <div className="flex gap-3">
               <input
                 value={q.answer}
                 onChange={(e) => updateQuestion(q.id, { answer: e.target.value })}
+                readOnly={!!q.options}
                 className="flex-1 rounded-xl border border-slate-300 px-3 py-2"
                 placeholder="Đáp án"
                 aria-label={`Đáp án ${i + 1}`}
@@ -141,16 +242,16 @@ function Editor({ initial }: { initial: QuestionSet }) {
         + Thêm câu hỏi
       </button>
 
-      {error && <p className="mt-4 rounded-xl bg-rose-50 p-3 font-semibold text-rose-700">{error}</p>}
+      {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-3 font-semibold text-rose-700">{error}</p>}
 
       <div className="sticky bottom-0 mt-6 flex gap-3 bg-[var(--background)] py-4">
         <button
           type="button"
           onClick={save}
-          disabled={saving}
+          disabled={saving || imagesLoading > 0}
           className="flex-1 rounded-xl bg-indigo-600 py-3 text-lg font-bold text-white hover:bg-indigo-700 disabled:opacity-60"
         >
-          {saving ? "Đang lưu…" : "Lưu bộ câu hỏi"}
+          {saving ? "Đang lưu…" : imagesLoading > 0 ? "Đang tải hình…" : "Lưu bộ câu hỏi"}
         </button>
       </div>
     </main>
