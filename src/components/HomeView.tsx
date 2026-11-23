@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORIES } from "@/lib/builtinSets";
+import { GAME_CATALOG } from "@/lib/gameCatalog";
 import { deleteSet, fetchSets, loadGame, saveGame } from "@/lib/storage";
 import type { GameState, QuestionSet } from "@/lib/types";
 
@@ -10,9 +11,11 @@ const ALL = "Tất cả";
 const MINE = "Của tôi";
 
 const FEATURES = [
+  { id: "games", label: "Trò chơi", icon: "🎮" },
   { id: "questions", label: "Kho câu hỏi", icon: "📚" },
   { id: "assignments", label: "Bài đã giao", icon: "📋" },
   { id: "ai", label: "Công cụ AI", icon: "✨" },
+  { id: "flashcards", label: "Flashcard tiếng Anh", icon: "🃏" },
   { id: "community", label: "Cộng đồng", icon: "🤝" },
   { id: "utilities", label: "Tiện ích dạy học", icon: "🧰" },
   { id: "simulations", label: "Mô phỏng bài học", icon: "🎨" },
@@ -33,7 +36,8 @@ export default function HomeView() {
   const [game, setGame] = useState<GameState | null>(() => loadGame());
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(ALL);
-  const [feature, setFeature] = useState<Feature>("questions");
+  const [feature, setFeature] = useState<Feature>("games");
+  const [gameSelected, setGameSelected] = useState(false);
 
   const shown = useMemo(() => {
     const q = normalize(query.trim());
@@ -86,7 +90,7 @@ export default function HomeView() {
       </header>
       <nav aria-label="Nhóm tính năng" className="mb-6 flex flex-wrap gap-2 rounded-2xl bg-white p-3 shadow-sm">
         {FEATURES.map((item) => (
-          <button key={item.id} type="button" aria-pressed={feature === item.id} onClick={() => setFeature(item.id)}
+          <button key={item.id} type="button" aria-pressed={feature === item.id} onClick={() => { setFeature(item.id); setGameSelected(false); }}
             className={`rounded-xl px-4 py-3 text-left text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
               feature === item.id ? "bg-indigo-600 text-white" : "text-slate-700 hover:bg-indigo-50"
             }`}>
@@ -95,7 +99,35 @@ export default function HomeView() {
         ))}
       </nav>
 
-      {feature === "questions" && <section aria-label="Kho câu hỏi">
+      {feature === "games" && !gameSelected && <section aria-label="Danh sách trò chơi">
+        <div className="mb-4">
+          <h2 className="text-2xl font-extrabold text-indigo-800">🎮 Trò chơi học tập</h2>
+          <p className="mt-1 text-slate-600">Chọn trò chơi để cùng học nhé! Các trò chưa triển khai được đánh dấu bên dưới.</p>
+        </div>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {GAME_CATALOG.map((item) => (
+            <li key={item.id} className="flex flex-col rounded-2xl bg-white p-5 shadow-sm">
+              <span className="mb-3 text-4xl" aria-hidden="true">{item.icon}</span>
+              <h3 className="text-lg font-extrabold text-slate-800">{item.title}</h3>
+              <p className="mt-1 flex-1 text-sm text-slate-600">{item.description}</p>
+              {item.status === "tile" ? (
+                <button type="button" onClick={() => setGameSelected(true)} className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chọn bộ câu hỏi</button>
+              ) : item.status === "flashcards" ? (
+                <Link href="/flashcards" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
+              ) : (
+                <span className="mt-4 self-start rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">Chưa triển khai</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>}
+
+      {(feature === "questions" || (feature === "games" && gameSelected)) && <section aria-label={feature === "games" ? "Chọn bộ câu hỏi cho Ô Số Đồng Đội" : "Kho câu hỏi"}>
+      {feature === "games" && <div className="mb-5">
+        <button type="button" onClick={() => setGameSelected(false)} className="font-bold text-indigo-700 hover:underline">← Danh sách trò chơi</button>
+        <h2 className="mt-3 text-2xl font-extrabold text-indigo-800">🧩 Ô Số Đồng Đội</h2>
+        <p className="mt-1 text-slate-600">Chọn bộ câu hỏi để bắt đầu chơi cùng các đội.</p>
+      </div>}
       {game && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-100 p-4">
           <span className="font-semibold text-amber-900">
@@ -234,7 +266,14 @@ export default function HomeView() {
         </div>
       </section>}
 
-      {feature !== "questions" && feature !== "assignments" && feature !== "ai" && (() => {
+      {feature === "flashcards" && <section className="rounded-3xl bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold uppercase tracking-wide text-indigo-600">Học mà chơi</p>
+        <h2 className="mt-2 text-2xl font-extrabold">🃏 Flashcard tiếng Anh</h2>
+        <p className="mt-2 text-slate-600">Khám phá từ vựng theo chủ đề, nghe phát âm và lật thẻ xem nghĩa tiếng Việt.</p>
+        <Link href="/flashcards" className="mt-5 inline-block rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
+      </section>}
+
+      {feature !== "games" && feature !== "questions" && feature !== "assignments" && feature !== "ai" && feature !== "flashcards" && (() => {
         const selected = FEATURES.find((item) => item.id === feature);
         return <section className="rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="text-2xl font-extrabold"><span aria-hidden="true">{selected?.icon} </span>{selected?.label}</h2>

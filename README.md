@@ -4,7 +4,11 @@ Trò chơi đố vui chia đội cho lớp học: chọn bộ câu hỏi, chia �
 
 Có các bộ hỗ trợ giáo viên dạy tiếng Anh cho trẻ, thuộc hai chủ đề "Anh văn mầm non" và "Anh văn tiểu học".
 
-Trang chủ chia nhóm tính năng thành kho câu hỏi, bài đã giao và công cụ AI. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
+Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công cụ AI và flashcard. Chọn **Trò chơi → Ô Số Đồng Đội → Chọn bộ câu hỏi** để xem danh sách bộ câu hỏi hiện có và chơi; danh sách này cũng có trong **Kho câu hỏi** để quản lý. Thẻ lật tiếng Anh cũng sử dụng được từ danh mục trò chơi; các trò khác trong danh mục được ghi rõ là chưa triển khai. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
+
+## Flashcard tiếng Anh
+
+Chọn **Flashcard tiếng Anh** ở trang chủ để học từ vựng theo các chủ đề con vật, trái cây, màu sắc và số đếm. Chạm thẻ để xem nghĩa, dùng nút trước/sau để đổi thẻ và nghe phát âm bằng giọng đọc của trình duyệt. Tính năng phát âm phụ thuộc trình duyệt và giọng tiếng Anh trên thiết bị. Các bộ thẻ có sẵn; vị trí thẻ không được lưu khi rời trang.
 
 ## Câu hỏi có hình
 
