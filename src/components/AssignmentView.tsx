@@ -73,7 +73,7 @@ export default function AssignmentView() {
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6">
-      <Link href="/" className="font-bold text-indigo-700">← Kho câu hỏi</Link>
+      <Link href="/" className="back-link">← Trang chủ</Link>
       <header className="my-5 rounded-3xl bg-indigo-600 p-6 text-white">
         <h1 className="text-3xl font-extrabold">📋 Giao bài &amp; báo cáo</h1>
         <p className="mt-2">Tạo bài trắc nghiệm, chia sẻ mã và xem kết quả của lớp.</p>
@@ -86,7 +86,7 @@ export default function AssignmentView() {
             <option value="">Chọn bộ câu hỏi</option>
             {sets.map((s) => <option key={s.id} value={s.id}>{s.title} ({s.questions.filter((q) => q.options).length} câu trắc nghiệm)</option>)}
           </select>
-          <button type="button" disabled={busy} onClick={create} className="rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white disabled:opacity-50">Tạo mã bài</button>
+          <button type="button" disabled={busy} onClick={create} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white disabled:opacity-50">Tạo mã bài</button>
         </div>
       </section>
       {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-4 font-semibold text-rose-700">{error}</p>}

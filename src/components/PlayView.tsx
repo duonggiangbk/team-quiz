@@ -60,7 +60,7 @@ export default function PlayView() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <Link href="/" className="font-semibold text-indigo-600 hover:underline">
+        <Link href="/" className="back-link">
           ← Trang chủ
         </Link>
         <h1 className="truncate text-xl font-extrabold text-indigo-800">{game.setTitle}</h1>
@@ -125,7 +125,7 @@ function Setup({
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 p-6">
-      <Link href="/" className="font-semibold text-indigo-600 hover:underline">
+      <Link href="/" className="back-link">
         ← Trang chủ
       </Link>
       <div className="mt-4 rounded-3xl bg-white p-6 shadow">

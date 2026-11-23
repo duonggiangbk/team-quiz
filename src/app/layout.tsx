@@ -4,8 +4,8 @@ import AccountBar from "@/components/AccountBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ô Số Đồng Đội – Team Quiz",
-  description: "Trò chơi đố vui theo đội cho lớp học",
+  title: "Team Quiz – Lớp học vui",
+  description: "Trò chơi, thẻ học và bài tập vui cho lớp học",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

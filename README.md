@@ -4,11 +4,13 @@ Trò chơi đố vui chia đội cho lớp học: chọn bộ câu hỏi, chia �
 
 Có các bộ hỗ trợ giáo viên dạy tiếng Anh cho trẻ, thuộc hai chủ đề "Anh văn mầm non" và "Anh văn tiểu học".
 
-Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công cụ AI và flashcard. Chọn **Trò chơi → Ô Số Đồng Đội → Chọn bộ câu hỏi** để xem danh sách bộ câu hỏi hiện có và chơi; danh sách này cũng có trong **Kho câu hỏi** để quản lý. Chặn Zombie, Kéo thả nối ý, Ô chữ khóa bí mật và Thẻ lật tiếng Anh cũng sử dụng được từ danh mục trò chơi; các trò khác trong danh mục được ghi rõ là chưa triển khai. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
+Trang chủ có danh mục trò chơi, kho câu hỏi, bài đã giao, công cụ AI và flashcard. Chọn **Trò chơi → Ô Số Đồng Đội → Chọn bộ câu hỏi** để xem danh sách bộ câu hỏi hiện có và chơi; danh sách này cũng có trong **Kho câu hỏi** để quản lý. Chặn Zombie, Từ ngữ biết bay, Kéo thả nối ý, Ô chữ khóa bí mật và Thẻ lật tiếng Anh cũng sử dụng được từ danh mục trò chơi; các trò khác trong danh mục được ghi rõ là chưa triển khai. Các mục cộng đồng, tiện ích dạy học, mô phỏng bài học và khóa học hiện chỉ là mục giới thiệu, chưa có chức năng.
 
 ## Chặn Zombie
 
 Chọn **Trò chơi → Chặn Zombie**, chọn một bộ trong kho và xem trước câu hỏi, lựa chọn trước khi chơi. Câu trắc nghiệm giữ nguyên lựa chọn; câu chỉ có đáp án được tạo thêm tối đa ba lựa chọn từ các đáp án khác trong cùng bộ. Giáo viên cần kiểm tra vì lựa chọn tự tạo có thể không phù hợp hoặc có nhiều đáp án đúng. Câu không có đủ dữ liệu hoặc không có đáp án khác để tạo lựa chọn sẽ bị bỏ qua; có thể sửa bộ trong kho.
+
+Chọn **Tạo bộ câu hỏi bằng AI** để mở trình soạn kho, tạo và kiểm tra câu hỏi rồi lưu; sau khi lưu, trang quay lại Chặn Zombie để chọn bộ vừa tạo. Cùng bộ này cũng dùng được cho Ô Số Đồng Đội.
 
 Mỗi câu bắt đầu với 30 giây. Chọn sai tăng tốc zombie thêm 50% tốc độ ban đầu và có thể chọn lại đáp án khác; chọn đúng chuyển sang câu tiếp theo. Nếu zombie đến hàng rào, ván kết thúc. Có thể tạm dừng và chơi lại; khi chuyển sang ứng dụng khác, ván tự tạm dừng. Tiến độ ván không được lưu khi rời trang.
 
@@ -16,11 +18,19 @@ Mỗi câu bắt đầu với 30 giây. Chọn sai tăng tốc zombie thêm 50% 
 
 Chọn **Trò chơi → Kéo thả nối ý** để chơi bài mẫu hoặc tạo bộ gồm 2–8 cặp. Nhập các cặp tương ứng hoặc sao chép câu hỏi, đáp án và hình minh họa từ kho rồi chỉnh sửa. Các ý trong cùng một cột phải khác nhau để mỗi cặp có một đáp án rõ ràng. Bộ tự tạo có thể sửa, xóa; tối đa 100 bộ được lưu trên trình duyệt này, không đồng bộ giữa thiết bị và có thể mất khi xóa dữ liệu trình duyệt.
 
+Trong trình soạn, nhập chủ đề, độ tuổi và số cặp để AI tạo bản nháp; kiểm tra, chỉnh sửa rồi lưu. Nếu đã có nội dung, ứng dụng hỏi trước khi thay thế các cặp và hình ảnh đang soạn.
+
+## Từ ngữ biết bay
+
+Chọn **Trò chơi → Từ ngữ biết bay** để chơi bài mẫu hoặc tạo bộ gồm 1–10 câu. Mỗi câu có 2–12 từ và gợi ý tùy chọn. Chạm các từ đang bay theo đúng thứ tự trong 30 giây; có thể bỏ từ đã chọn, thử lại khi sai hoặc hết giờ, hay bỏ qua câu. Hoàn thành được một điểm mỗi câu. Giáo viên có thể tự nhập hoặc dùng AI tạo bản nháp theo chủ đề, sau đó kiểm tra và chỉnh sửa trước khi lưu. Bộ tự tạo chỉ lưu trên trình duyệt này (tối đa 100 bộ), không đồng bộ giữa thiết bị; tiến độ chơi không được lưu.
+
 Trong ván chơi, kéo từ ý bên trái sang bên phải, hoặc chạm/chọn lần lượt hai ý bằng điện thoại hay bàn phím. Mỗi ý chỉ nối với một ý khác; chọn lại để đổi hoặc bỏ nối. **Kiểm tra** cho biết số cặp đúng và đánh dấu từng cặp đã nối, kể cả khi chưa nối hết; **Chơi lại** xóa các nối và xáo trộn cột phải. Tiến độ không được lưu khi rời ván.
 
 ## Ô chữ khóa bí mật
 
 Chọn **Trò chơi → Ô chữ khóa bí mật** để chơi bài mẫu hoặc tạo ô chữ. Nhập tên và từ khóa 2–12 chữ cái, rồi tự nhập gợi ý và đáp án từng hàng hoặc sao chép câu hỏi từ kho; mỗi hàng cần chọn vị trí chữ giao với từ khóa. Có thể chỉnh câu và đáp án đã sao chép, kể cả khi đáp án gốc không phù hợp. Hình ảnh của câu hỏi trong kho được sao chép theo. Đáp án dùng tối đa 20 chữ cái; dấu tiếng Việt, khoảng trắng và dấu gạch nối được bỏ khi xếp ô và kiểm tra câu trả lời.
+
+Có thể nhập từ khóa, chủ đề và độ tuổi để AI tạo các hàng phù hợp. Kiểm tra câu gợi ý, đáp án và vị trí giao rồi chỉnh sửa trước khi lưu. Nếu đã có nội dung, ứng dụng hỏi trước khi thay thế các hàng và hình ảnh đang soạn.
 
 Khi chơi, chọn hàng và trả lời để mở, hoặc dùng nút mở đáp án. Có thể đoán hoặc mở từ khóa bất cứ lúc nào. Giáo viên điều khiển trò chơi, không có tính điểm tự động; tiến độ không được lưu khi rời ván. Tối đa 100 ô chữ tự tạo được lưu trên trình duyệt hiện tại, không đồng bộ qua tài khoản hay thiết bị và có thể mất khi xóa dữ liệu trình duyệt. Sửa hoặc xóa chỉ áp dụng cho ô chữ tự tạo.
 
@@ -89,3 +99,5 @@ Học sinh tự nhập tên, không cần tài khoản và có thể nộp nhi�
 Thêm `GEMINI_API_KEY` vào Environment Variables trên Vercel và triển khai lại. Khi chạy trên máy, đặt biến trong `.env.local`; không đưa khóa vào mã nguồn hoặc trình duyệt. AI yêu cầu cấu hình Upstash để giới hạn chung 10 lượt trong khoảng 60 giây và 100 lượt trong khoảng 24 giờ, tính từ lượt đầu tiên của mỗi khoảng. Tạo câu hỏi bằng AI còn yêu cầu `EDIT_PIN`. Mặc định dùng `gemini-3.5-flash-lite`; có thể đặt `GEMINI_MODEL` nếu tài khoản không hỗ trợ model này. Hạn mức thực tế phụ thuộc tài khoản và model.
 
 Trong **Soạn bộ câu hỏi**, nhập chủ đề, chọn độ tuổi và số câu để tạo câu trắc nghiệm; câu mới được thêm vào cuối, cần giáo viên kiểm tra trước khi lưu. **Trợ lý học tập** ở trang chủ trả lời từng câu hỏi độc lập, không lưu lịch sử. Nội dung được gửi đến Google và gói miễn phí có thể dùng dữ liệu để cải thiện sản phẩm: không nhập dữ liệu cá nhân. AI có thể sai hoặc đưa ra nội dung không phù hợp dù có bộ lọc; trẻ cần dùng dưới sự giám sát của giáo viên hoặc phụ huynh. Nếu bật thanh toán, việc sử dụng API có thể phát sinh phí.
+
+Tạo bản nháp AI cho nối ý và ô chữ dùng cùng cấu hình `GEMINI_API_KEY`, Upstash và `EDIT_PIN`, cùng giới hạn chung với các tính năng AI khác. Chủ đề và từ khóa được gửi đến Google; không nhập thông tin cá nhân.

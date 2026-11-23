@@ -3,7 +3,7 @@ export interface GameCatalogItem {
   title: string;
   description: string;
   icon: string;
-  status: "tile" | "flashcards" | "crossword" | "matching" | "zombies" | "planned";
+  status: "tile" | "flashcards" | "crossword" | "matching" | "zombies" | "flying-words" | "planned";
 }
 
 export const GAME_CATALOG: GameCatalogItem[] = [
@@ -22,7 +22,7 @@ export const GAME_CATALOG: GameCatalogItem[] = [
   { id: "duel", title: "Game đối kháng", description: "Hai người chơi cùng thi trả lời.", icon: "⚔️", status: "planned" },
   { id: "paper-mode", title: "Chế độ giấy", description: "Trả lời trắc nghiệm bằng thẻ giấy.", icon: "📄", status: "planned" },
   { id: "rhythm-quiz", title: "Trắc nghiệm theo nhịp độ", description: "Trò chơi câu hỏi theo nhịp độ lớp học.", icon: "⏱️", status: "planned" },
-  { id: "flying-words", title: "Từ ngữ biết bay", description: "Chọn và sắp xếp từ thành câu.", icon: "🔤", status: "planned" },
+  { id: "flying-words", title: "Từ ngữ biết bay", description: "Chọn các từ đang bay để ghép thành câu.", icon: "🔤", status: "flying-words" },
   { id: "matching", title: "Kéo thả nối ý", description: "Ghép các ý tương ứng với nhau.", icon: "🧷", status: "matching" },
   { id: "crossword", title: "Ô chữ khóa bí mật", description: "Giải câu hỏi để khám phá ô chữ.", icon: "🔠", status: "crossword" },
   { id: "flashcards", title: "Thẻ lật tiếng Anh", description: "Học từ tiếng Anh bằng thẻ lật có sẵn.", icon: "🃏", status: "flashcards" },

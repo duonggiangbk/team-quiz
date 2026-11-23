@@ -22,6 +22,18 @@ const FEATURES = [
   { id: "courses", label: "Khóa học", icon: "🎓" },
 ] as const;
 type Feature = (typeof FEATURES)[number]["id"];
+const UPCOMING_FEATURES = new Set<Feature>(["community", "utilities", "simulations", "courses"]);
+
+const GAME_ACTIONS: Record<string, { href: string; label: string }> = {
+  tile: { href: "", label: "Chọn bộ câu hỏi" },
+  zombies: { href: "/zombies", label: "Chơi chặn zombie" },
+  "flying-words": { href: "/flying-words", label: "Chơi ghép câu" },
+  matching: { href: "/matching", label: "Chơi nối ý" },
+  crossword: { href: "/crossword", label: "Chơi ô chữ" },
+  flashcards: { href: "/flashcards", label: "Bắt đầu học" },
+};
+const PLAYABLE_GAMES = GAME_CATALOG.filter((item) => item.status in GAME_ACTIONS);
+const UPCOMING_GAMES = GAME_CATALOG.filter((item) => !(item.status in GAME_ACTIONS));
 
 function normalize(text: string) {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
@@ -95,6 +107,7 @@ export default function HomeView() {
               feature === item.id ? "bg-indigo-600 text-white" : "text-slate-700 hover:bg-indigo-50"
             }`}>
             <span aria-hidden="true">{item.icon} </span>{item.label}
+            {UPCOMING_FEATURES.has(item.id) && <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${feature === item.id ? "bg-white/25" : "bg-slate-100 text-slate-500"}`}>Sắp có</span>}
           </button>
         ))}
       </nav>
@@ -102,35 +115,45 @@ export default function HomeView() {
       {feature === "games" && !gameSelected && <section aria-label="Danh sách trò chơi">
         <div className="mb-4">
           <h2 className="text-2xl font-extrabold text-indigo-800">🎮 Trò chơi học tập</h2>
-          <p className="mt-1 text-slate-600">Chọn trò chơi để cùng học nhé! Các trò chưa triển khai được đánh dấu bên dưới.</p>
+          <p className="mt-1 text-slate-600">Chọn một trò chơi để cả lớp cùng học và ghi điểm nhé!</p>
         </div>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {GAME_CATALOG.map((item) => (
-            <li key={item.id} className="flex flex-col rounded-2xl bg-white p-5 shadow-sm">
-              <span className="mb-3 text-4xl" aria-hidden="true">{item.icon}</span>
-              <h3 className="text-lg font-extrabold text-slate-800">{item.title}</h3>
-              <p className="mt-1 flex-1 text-sm text-slate-600">{item.description}</p>
-              {item.status === "tile" ? (
-                <button type="button" onClick={() => setGameSelected(true)} className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chọn bộ câu hỏi</button>
-              ) : item.status === "flashcards" ? (
-                <Link href="/flashcards" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
-              ) : item.status === "crossword" ? (
-                <Link href="/crossword" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi ô chữ</Link>
-              ) : item.status === "matching" ? (
-                <Link href="/matching" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi nối ý</Link>
-              ) : item.status === "zombies" ? (
-                <Link href="/zombies" className="mt-4 self-start rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">Chơi chặn zombie</Link>
-              ) : (
-                <span className="mt-4 self-start rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">Chưa triển khai</span>
-              )}
-            </li>
-          ))}
+          {PLAYABLE_GAMES.map((item) => {
+            const action = GAME_ACTIONS[item.status];
+            const className = "mt-4 inline-flex min-h-11 items-center self-start rounded-xl bg-indigo-600 px-5 font-bold text-white shadow-sm transition hover:bg-indigo-700 active:scale-95";
+            return (
+              <li key={item.id} className="flex flex-col rounded-3xl border-2 border-indigo-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md">
+                <span className="mb-3 text-5xl" aria-hidden="true">{item.icon}</span>
+                <h3 className="text-xl font-extrabold text-slate-800">{item.title}</h3>
+                <p className="mt-1 flex-1 text-slate-600">{item.description}</p>
+                {item.status === "tile" ? (
+                  <button type="button" onClick={() => setGameSelected(true)} className={className}>{action.label} →</button>
+                ) : (
+                  <Link href={action.href} className={className}>{action.label} →</Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
+        {UPCOMING_GAMES.length > 0 && <>
+          <h3 className="mb-3 mt-10 text-xl font-extrabold text-slate-700">🚧 Sắp ra mắt</h3>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {UPCOMING_GAMES.map((item) => (
+              <li key={item.id} className="flex items-start gap-3 rounded-2xl bg-white/70 p-4 text-slate-500">
+                <span className="text-3xl opacity-70" aria-hidden="true">{item.icon}</span>
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-700">{item.title}</p>
+                  <span className="mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold">Sắp có</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>}
       </section>}
 
       {(feature === "questions" || (feature === "games" && gameSelected)) && <section aria-label={feature === "games" ? "Chọn bộ câu hỏi cho Ô Số Đồng Đội" : "Kho câu hỏi"}>
       {feature === "games" && <div className="mb-5">
-        <button type="button" onClick={() => setGameSelected(false)} className="font-bold text-indigo-700 hover:underline">← Danh sách trò chơi</button>
+        <button type="button" onClick={() => setGameSelected(false)} className="back-link">← Danh sách trò chơi</button>
         <h2 className="mt-3 text-2xl font-extrabold text-indigo-800">🧩 Ô Số Đồng Đội</h2>
         <p className="mt-1 text-slate-600">Chọn bộ câu hỏi để bắt đầu chơi cùng các đội.</p>
       </div>}
@@ -142,7 +165,7 @@ export default function HomeView() {
           <div className="flex gap-2">
             <Link
               href={`/play?set=${encodeURIComponent(game.setId)}&resume=1`}
-              className="rounded-xl bg-amber-500 px-4 py-2 font-bold text-white hover:bg-amber-600"
+              className="inline-flex min-h-11 items-center rounded-xl bg-amber-500 px-4 font-bold text-white hover:bg-amber-600"
             >
               Tiếp tục
             </Link>
@@ -152,7 +175,7 @@ export default function HomeView() {
                 saveGame(null);
                 setGame(null);
               }}
-              className="rounded-xl bg-white px-4 py-2 font-semibold text-amber-900 hover:bg-amber-50"
+              className="min-h-11 rounded-xl bg-white px-4 font-semibold text-amber-900 hover:bg-amber-50"
             >
               Bỏ ván
             </button>
@@ -160,11 +183,11 @@ export default function HomeView() {
         </div>
       )}
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-2xl font-bold">
           Bộ câu hỏi <span className="text-base font-semibold text-slate-500">({shown.length}/{sets.length})</span>
         </h2>
-        <Link href="/edit" className="rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700">
+        <Link href="/edit" className="inline-flex min-h-11 items-center rounded-xl bg-indigo-600 px-4 font-bold text-white hover:bg-indigo-700">
           + Tạo bộ mới
         </Link>
       </div>
@@ -180,7 +203,8 @@ export default function HomeView() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="🔍 Tìm bộ câu hỏi…"
-        className="mb-3 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-lg outline-none focus:border-indigo-400"
+        aria-label="Tìm bộ câu hỏi"
+        className="mb-3 w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-lg focus:border-indigo-400"
       />
       <div className="mb-5 flex flex-wrap gap-2">
         {[ALL, ...CATEGORIES, MINE].map((c) => (
@@ -188,7 +212,8 @@ export default function HomeView() {
             key={c}
             type="button"
             onClick={() => setCategory(c)}
-            className={`rounded-full px-3 py-1 text-sm font-semibold ${
+            aria-pressed={category === c}
+            className={`min-h-10 rounded-full px-4 text-sm font-semibold ${
               category === c ? "bg-indigo-600 text-white" : "bg-white text-indigo-700 hover:bg-indigo-50"
             }`}
           >
@@ -228,20 +253,20 @@ export default function HomeView() {
               <div className="mt-4 flex gap-2">
                 <Link
                   href={`/play?set=${encodeURIComponent(set.id)}`}
-                  className="flex-1 rounded-xl bg-emerald-500 py-2 text-center font-bold text-white hover:bg-emerald-600"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600"
                 >
                   ▶ Chơi
                 </Link>
                 <Link
                   href={`/edit?id=${encodeURIComponent(set.id)}`}
-                  className="rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-200"
+                  className="inline-flex min-h-11 items-center rounded-xl bg-slate-100 px-4 font-semibold text-slate-700 hover:bg-slate-200"
                 >
                   Sửa
                 </Link>
                 <button
                   type="button"
                   onClick={() => remove(set.id)}
-                  className="rounded-xl bg-rose-50 px-4 py-2 font-semibold text-rose-600 hover:bg-rose-100"
+                  className="min-h-11 rounded-xl bg-rose-50 px-4 font-semibold text-rose-600 hover:bg-rose-100"
                 >
                   Xóa
                 </button>
@@ -257,8 +282,8 @@ export default function HomeView() {
         <h2 className="mt-2 text-2xl font-extrabold">📋 Bài đã giao &amp; báo cáo</h2>
         <p className="mt-2 text-slate-600">Giáo viên giao bài bằng mã hoặc liên kết, xem điểm và kết quả của các bé.</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <Link href="/assignments" className="rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Giao bài &amp; xem báo cáo</Link>
-          <Link href="/join" className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Nhập mã làm bài</Link>
+          <Link href="/assignments" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Giao bài &amp; xem báo cáo</Link>
+          <Link href="/join" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Nhập mã làm bài</Link>
         </div>
       </section>}
 
@@ -267,8 +292,8 @@ export default function HomeView() {
         <h2 className="mt-2 text-2xl font-extrabold">✨ Công cụ AI</h2>
         <p className="mt-2 text-slate-600">Tạo câu hỏi theo chủ đề hoặc nhận gợi ý học tập. Giáo viên cần kiểm tra nội dung do AI tạo.</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <Link href="/edit" className="rounded-xl bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700">Tạo câu hỏi bằng AI</Link>
-          <Link href="/ai" className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Trợ lý học tập</Link>
+          <Link href="/edit" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700">Tạo câu hỏi bằng AI</Link>
+          <Link href="/ai" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Trợ lý học tập</Link>
         </div>
       </section>}
 
@@ -276,15 +301,18 @@ export default function HomeView() {
         <p className="text-sm font-bold uppercase tracking-wide text-indigo-600">Học mà chơi</p>
         <h2 className="mt-2 text-2xl font-extrabold">🃏 Flashcard tiếng Anh</h2>
         <p className="mt-2 text-slate-600">Khám phá từ vựng theo chủ đề, nghe phát âm và lật thẻ xem nghĩa tiếng Việt.</p>
-        <Link href="/flashcards" className="mt-5 inline-block rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
+        <Link href="/flashcards" className="min-h-11 inline-flex items-center justify-center mt-5 rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Bắt đầu học</Link>
       </section>}
 
       {feature !== "games" && feature !== "questions" && feature !== "assignments" && feature !== "ai" && feature !== "flashcards" && (() => {
         const selected = FEATURES.find((item) => item.id === feature);
         return <section className="rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="text-2xl font-extrabold"><span aria-hidden="true">{selected?.icon} </span>{selected?.label}</h2>
-          <p className="mt-3 rounded-2xl bg-amber-50 p-4 text-amber-900">Tính năng này chưa được triển khai. Bạn có thể sử dụng kho câu hỏi, bài giao và công cụ AI trong lúc chờ.</p>
-          <button type="button" onClick={() => setFeature("questions")} className="mt-4 rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Về kho câu hỏi</button>
+          <p className="mt-3 rounded-2xl bg-amber-50 p-4 text-amber-900">🚧 Tính năng này sắp ra mắt. Trong lúc chờ, cả lớp hãy cùng chơi các trò chơi học tập nhé!</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setFeature("games")} className="min-h-11 rounded-xl bg-indigo-600 px-5 font-bold text-white hover:bg-indigo-700">🎮 Xem trò chơi</button>
+            <button type="button" onClick={() => setFeature("questions")} className="min-h-11 rounded-xl bg-slate-100 px-5 font-bold text-slate-700 hover:bg-slate-200">📚 Kho câu hỏi</button>
+          </div>
         </section>;
       })()}
     </main>

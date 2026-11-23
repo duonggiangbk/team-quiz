@@ -106,7 +106,7 @@ export default function FlashcardsPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 p-4 sm:p-6">
-      <Link href="/" className="font-bold text-indigo-700">← Về trang chủ</Link>
+      <Link href="/" className="back-link">← Trang chủ</Link>
       <header className="my-5 rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white">
         <h1 className="text-3xl font-extrabold">🃏 Flashcard tiếng Anh</h1>
         <p className="mt-2">Chọn chủ đề, nghe từ và lật thẻ để khám phá nghĩa nhé!</p>
@@ -151,7 +151,7 @@ export default function FlashcardsPage() {
         {card.image && card.image === failedImage && <p role="status" className="mt-2 text-center text-sm text-amber-800">Không tải được hình ảnh. Hãy kiểm tra lại liên kết.</p>}
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={() => moveCard(cardIndex - 1)} disabled={cardIndex === 0} className="rounded-xl bg-slate-100 px-4 py-3 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40">← Thẻ trước</button>
-          <button type="button" onClick={speak} className="rounded-xl bg-violet-600 px-4 py-3 font-bold text-white hover:bg-violet-700">🔊 Nghe phát âm</button>
+          <button type="button" onClick={speak} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-3 font-bold text-white hover:bg-violet-700">🔊 Nghe phát âm</button>
           <button type="button" onClick={() => moveCard(cardIndex + 1)} disabled={cardIndex === deck.cards.length - 1} className="rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-40">Thẻ tiếp →</button>
         </div>
         {speechError && <p role="alert" className="mt-4 rounded-xl bg-amber-50 p-3 text-center text-amber-900">{speechError}</p>}

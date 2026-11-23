@@ -107,7 +107,7 @@ export default function FlashcardEditor({ initial, onSave, onCancel }: {
             </select>
           </label>
         </div>
-        <button type="button" onClick={generate} className="rounded-xl bg-violet-600 px-4 py-2 font-bold text-white">{busy ? "Đang tạo…" : "✨ Tạo thẻ bằng AI"}</button>
+        <button type="button" onClick={generate} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2 font-bold text-white">{busy ? "Đang tạo…" : "✨ Tạo thẻ bằng AI"}</button>
       </div>
       <h3 className="font-bold">Nội dung thẻ ({cards.length}/{MAX_FLASHCARDS})</h3>
       {cards.map((card, index) => <div key={index} className="space-y-2 rounded-2xl border border-indigo-100 p-3">
@@ -133,8 +133,8 @@ export default function FlashcardEditor({ initial, onSave, onCancel }: {
       </div>)}
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={() => setCards([...cards, blankCard()])} disabled={cards.length >= MAX_FLASHCARDS} className="rounded-xl bg-indigo-100 px-4 py-2 font-bold text-indigo-800 disabled:opacity-40">+ Thêm thẻ</button>
-        <button type="button" onClick={save} className="rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white">Lưu bộ thẻ</button>
-        <button type="button" onClick={onCancel} className="rounded-xl bg-slate-100 px-4 py-2 font-bold text-slate-700">Hủy</button>
+        <button type="button" onClick={save} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white">Lưu bộ thẻ</button>
+        <button type="button" onClick={onCancel} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 font-bold text-slate-700">Hủy</button>
       </div>
     </fieldset>
     {busy && <p role="status">Đang tạo thẻ, vui lòng đợi…</p>}

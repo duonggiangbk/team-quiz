@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import QuestionImage from "@/components/QuestionImage";
+import GameAiGenerator from "@/components/GameAiGenerator";
 import { normalizeWord, parseCrossword, SAMPLE_CROSSWORD, type Crossword, type CrosswordRow } from "@/lib/crossword";
 import { fetchSets, newId } from "@/lib/storage";
 import type { QuestionSet } from "@/lib/types";
 
 const STORAGE_KEY = "team-quiz:crosswords";
-const button = "rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 disabled:opacity-50";
+const button = "inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 disabled:opacity-50";
 const input = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900";
 const emptyRow = (): CrosswordRow => ({ clue: "", answer: "", position: -1 });
 
@@ -20,6 +21,7 @@ function Editor({ initial, onSave, onCancel }: { initial?: Crossword; onSave: (c
   const [setId, setSetId] = useState("");
   const [message, setMessage] = useState("");
   const [loadError, setLoadError] = useState("");
+  const [busy, setBusy] = useState(false);
   const word = normalizeWord(keyword);
   const selectedSet = sets.find((set) => set.id === setId);
 
@@ -46,9 +48,17 @@ function Editor({ initial, onSave, onCancel }: { initial?: Crossword; onSave: (c
 
   return <section className="mb-6 space-y-4 rounded-3xl bg-white p-5 shadow-sm" aria-label="Soạn ô chữ">
     <h2 className="text-xl font-extrabold text-indigo-800">{initial ? "✏️ Sửa ô chữ" : "✨ Tạo ô chữ mới"}</h2>
+    <fieldset disabled={busy} className="space-y-4 disabled:opacity-60">
     <label className="block font-bold">Tên ô chữ<input className={input} value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} /></label>
     <label className="block font-bold">Từ khóa bí mật<input className={input} value={keyword} maxLength={80} onChange={(e) => setKeyword(e.target.value)} placeholder="Ví dụ: HOA" /></label>
     <p className="text-sm text-slate-600">Từ khóa có 2–12 chữ cái; bỏ dấu, khoảng trắng và dấu gạch nối khi xếp ô. Mỗi chữ tạo một hàng ngang. Đổi độ dài từ khóa có thể bỏ các hàng cuối khi lưu.</p>
+    <GameAiGenerator kind="crossword" keyword={keyword} busy={busy} setBusy={setBusy} hasContent={rows.some((row) => row.clue.trim() || row.answer.trim() || row.image)} onApply={(data, topic) => {
+      const parsed = parseCrossword({ id: "ai", title: "AI", keyword, rows: data && typeof data === "object" && "rows" in data ? data.rows : null });
+      if (typeof parsed === "string") throw new Error("AI tạo ô chữ chưa hợp lệ. Hãy thử lại.");
+      setRows(Array.from({ length: 12 }, (_, i) => parsed.rows[i] ?? emptyRow()));
+      if (!title.trim()) setTitle(topic.slice(0, 100));
+      setMessage("");
+    }} />
     <label className="block font-bold">Lấy câu hỏi từ bộ có sẵn (tùy chọn)
       <select className={input} value={setId} onChange={(e) => setSetId(e.target.value)}>
         {!sets.length && <option value="">Không có bộ câu hỏi</option>}
@@ -84,7 +94,8 @@ function Editor({ initial, onSave, onCancel }: { initial?: Crossword; onSave: (c
       </fieldset>;
     })}
     {message && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-rose-700">{message}</p>}
-    <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={save}>Lưu ô chữ</button><button type="button" className="rounded-xl bg-slate-100 px-4 py-2 font-bold" onClick={onCancel}>Hủy</button></div>
+    <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={save}>Lưu ô chữ</button><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 font-bold" onClick={onCancel}>Hủy</button></div>
+    </fieldset>
   </section>;
 }
 
@@ -105,7 +116,7 @@ function Game({ puzzle, onExit }: { puzzle: Crossword; onExit: () => void }) {
   }
 
   return <section className="space-y-5 rounded-3xl bg-white p-5 shadow-sm">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-2xl font-extrabold text-indigo-800">{puzzle.title}</h2><button type="button" className="font-bold text-indigo-700" onClick={onExit}>← Danh sách ô chữ</button></div>
+    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-2xl font-extrabold text-indigo-800">{puzzle.title}</h2><button type="button" className="back-link" onClick={onExit}>← Danh sách ô chữ</button></div>
     <p className="text-slate-600">Chọn hàng, trả lời câu hỏi và khám phá các chữ màu vàng để tìm từ khóa!</p>
     <div className="overflow-x-auto rounded-2xl bg-indigo-50 p-3">
       <div className="w-max space-y-2">
@@ -124,7 +135,7 @@ function Game({ puzzle, onExit }: { puzzle: Crossword; onExit: () => void }) {
         <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); if (normalizeWord(guess) === selectedRow.answer) openRow(selected); else setMessage("Chưa đúng rồi, thử lại nhé!"); }}>
           <label className="sr-only" htmlFor="row-guess">Đáp án hàng {selected + 1}</label><input id="row-guess" className={`${input} max-w-xs`} value={guess} onChange={(e) => setGuess(e.target.value)} placeholder="Nhập đáp án" />
           <button className={button}>Trả lời</button>
-          <button type="button" className="rounded-xl bg-amber-200 px-4 py-2 font-bold text-amber-900" onClick={() => openRow(selected)}>Mở đáp án</button>
+          <button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-amber-200 px-4 py-2 font-bold text-amber-900" onClick={() => openRow(selected)}>Mở đáp án</button>
         </form>
       </>}
     </div>}
@@ -134,7 +145,7 @@ function Game({ puzzle, onExit }: { puzzle: Crossword; onExit: () => void }) {
       <p className="flex flex-wrap gap-1" aria-label={keywordOpen ? `Từ khóa: ${puzzle.keyword}` : "Các chữ khóa đã mở"}>{Array.from(puzzle.keyword).map((letter, i) => <span key={i} className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-200 text-xl font-extrabold text-amber-900">{keywordOpen || opened.includes(i) ? letter : "?"}</span>)}</p>
       {!keywordOpen && <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); if (normalizeWord(keywordGuess) === puzzle.keyword) { setKeywordOpen(true); setMessage("Giỏi lắm! Bạn đã tìm ra từ khóa!"); } else setMessage("Từ khóa chưa đúng, thử lại nhé!"); }}>
         <label className="sr-only" htmlFor="keyword-guess">Đoán từ khóa</label><input id="keyword-guess" className={`${input} max-w-xs`} value={keywordGuess} onChange={(e) => setKeywordGuess(e.target.value)} placeholder="Đoán từ khóa" />
-        <button className={button}>Đoán từ khóa</button><button type="button" className="rounded-xl bg-amber-300 px-4 py-2 font-bold text-amber-950" onClick={() => { setKeywordOpen(true); setMessage(""); }}>Mở từ khóa</button>
+        <button className={button}>Đoán từ khóa</button><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-amber-300 px-4 py-2 font-bold text-amber-950" onClick={() => { setKeywordOpen(true); setMessage(""); }}>Mở từ khóa</button>
       </form>}
     </div>
   </section>;
@@ -186,7 +197,7 @@ export default function CrosswordPage() {
   }
 
   return <main className="mx-auto w-full max-w-4xl flex-1 p-4 sm:p-6">
-    <Link href="/" className="font-bold text-indigo-700">← Về trang chủ</Link>
+    <Link href="/" className="back-link">← Trang chủ</Link>
     <header className="my-5 rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white"><h1 className="text-3xl font-extrabold">🔠 Ô chữ khóa bí mật</h1><p className="mt-2">Cùng giải ô chữ và khám phá từ khóa nhé!</p></header>
     <p className="mb-4 text-sm text-slate-700">Ô chữ tự tạo chỉ lưu trên trình duyệt này, không đồng bộ giữa các thiết bị. Tiến độ chơi không được lưu.</p>
     {error && <p role="alert" className="mb-4 rounded-xl bg-rose-50 p-3 text-rose-700">{error}</p>}
@@ -197,7 +208,7 @@ export default function CrosswordPage() {
         <ul className="grid gap-4 sm:grid-cols-2">{[SAMPLE_CROSSWORD, ...items].map((puzzle) => <li key={puzzle.id} className="rounded-2xl bg-white p-5 shadow-sm">
           <h3 className="text-lg font-extrabold text-slate-800">{puzzle.title}</h3><p className="my-2 text-sm text-slate-600">{puzzle.rows.length} hàng · {puzzle.id === SAMPLE_CROSSWORD.id ? "Bài mẫu" : "Tự tạo"}</p>
           <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={() => { setEditing(null); setPlaying(puzzle); }}>Chơi</button>
-            {puzzle.id !== SAMPLE_CROSSWORD.id && ready && <><button type="button" className="rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700" onClick={() => setEditing(puzzle.id)}>Sửa</button><button type="button" className="rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700" onClick={() => remove(puzzle)}>Xóa</button></>}
+            {puzzle.id !== SAMPLE_CROSSWORD.id && ready && <><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700" onClick={() => setEditing(puzzle.id)}>Sửa</button><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700" onClick={() => remove(puzzle)}>Xóa</button></>}
           </div>
         </li>)}</ul>
       </section>

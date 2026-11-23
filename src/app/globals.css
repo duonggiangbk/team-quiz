@@ -15,3 +15,46 @@ body {
   color: var(--foreground);
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
+
+.back-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 0.75rem;
+  padding: 0 0.75rem;
+  margin-left: -0.75rem;
+  font-weight: 700;
+  color: #4338ca;
+  transition: background-color 150ms;
+}
+
+.back-link:hover {
+  background-color: #e0e7ff;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #6366f1;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+@keyframes flying-word {
+  0%, 100% { transform: translateY(-4px) rotate(-2deg); }
+  50% { transform: translateY(4px) rotate(2deg); }
+}
+
+.flying-word {
+  animation: flying-word 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flying-word { animation: none; }
+}

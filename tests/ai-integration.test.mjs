@@ -43,6 +43,38 @@ test("AI routes validate requests and return teacher questions and student help"
     assert.equal(cardResult.status, 200, JSON.stringify(cardData));
     assert.deepEqual(cardData.cards[0], { english: "cat", vietnamese: "con mèo", picture: "🐱" });
     assert.equal((await post({ ...flashcards, topic: "mock-invalid" }, "test-pin")).status, 502);
+    const matching = { kind: "matching", topic: "con vật", level: "Tiểu học", count: 2 };
+    assert.equal((await post(matching)).status, 401);
+    assert.equal((await post({ ...matching, count: 9 }, "test-pin")).status, 400);
+    const pairResult = await post(matching, "test-pin");
+    assert.equal(pairResult.status, 200);
+    assert.deepEqual((await pairResult.json()).pairs, [{ left: "Mèo", right: "Meo meo" }, { left: "Chó", right: "Gâu gâu" }]);
+    assert.equal((await post({ ...matching, topic: "mock-invalid" }, "test-pin")).status, 502);
+    assert.equal((await post({ ...matching, count: 3 }, "test-pin")).status, 502);
+    assert.equal((await post({ ...matching, topic: "mock-duplicate" }, "test-pin")).status, 502);
+    assert.equal((await post({ ...matching, topic: "mock-json" }, "test-pin")).status, 502);
+    const crossword = { kind: "crossword", topic: "con vật", level: "Tiểu học", keyword: "HO" };
+    assert.equal((await post(crossword)).status, 401);
+    assert.equal((await post({ ...crossword, keyword: "H1" }, "test-pin")).status, 400);
+    const crosswordResult = await post(crossword, "test-pin");
+    assert.equal(crosswordResult.status, 200);
+    assert.deepEqual((await crosswordResult.json()).rows, [
+      { clue: "Con gì kêu gâu gâu?", answer: "CHO", position: 1 },
+      { clue: "Con gì kêu meo meo?", answer: "MEO", position: 2 },
+    ]);
+    assert.equal((await post({ ...crossword, keyword: "AB" }, "test-pin")).status, 502);
+    assert.equal((await post({ ...crossword, keyword: "HOA" }, "test-pin")).status, 502);
+    assert.equal((await post({ ...crossword, topic: "mock-invalid" }, "test-pin")).status, 502);
+    assert.equal((await post({ ...crossword, topic: "mock-json" }, "test-pin")).status, 502);
+    const flying = { kind: "flying-words", topic: "thiên nhiên", level: "Tiểu học", count: 2 };
+    assert.equal((await post(flying)).status, 401);
+    assert.equal((await post({ ...flying, count: 11 }, "test-pin")).status, 400);
+    const flyingResult = await post(flying, "test-pin");
+    assert.equal(flyingResult.status, 200);
+    assert.equal((await flyingResult.json()).rounds[0].sentence, "Mặt trời chiếu sáng");
+    assert.equal((await post({ ...flying, count: 3 }, "test-pin")).status, 502);
+    assert.equal((await post({ ...flying, topic: "mock-json" }, "test-pin")).status, 502);
+    assert.equal((await fetch(`${base}/flying-words`)).status, 200);
     assert.equal((await post({ kind: "help", question: "" })).status, 400);
     assert.equal((await post({ kind: "help", question: "mock-quota" })).status, 429);
     assert.equal((await post({ kind: "help", question: "mock-blocked" })).status, 502);

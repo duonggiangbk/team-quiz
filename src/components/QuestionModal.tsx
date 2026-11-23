@@ -45,7 +45,7 @@ export default function QuestionModal({ tile, teams, current, onAnswer, onPowerU
               <button
                 type="button"
                 onClick={() => setRevealed(true)}
-                className="mb-6 rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-200"
+                className="mb-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-200"
               >
                 👁 Xem đáp án
               </button>
@@ -66,7 +66,7 @@ export default function QuestionModal({ tile, teams, current, onAnswer, onPowerU
                 ✘ Sai
               </button>
             </div>
-            <button type="button" onClick={onClose} className="mt-4 w-full text-sm text-slate-500 hover:underline">
+            <button type="button" onClick={onClose} className="mt-4 min-h-11 w-full rounded-xl text-sm text-slate-500 hover:bg-slate-50 hover:underline">
               Đóng (chưa trả lời)
             </button>
           </>
@@ -103,7 +103,7 @@ function PowerUpBody({
                 key={t.id}
                 type="button"
                 onClick={() => onPowerUp(i)}
-                className="rounded-xl px-5 py-3 font-bold text-white shadow hover:opacity-90"
+                className="min-h-11 rounded-xl px-5 py-3 font-bold text-white shadow hover:opacity-90"
                 style={{ backgroundColor: t.color }}
               >
                 {t.name} ({t.score})

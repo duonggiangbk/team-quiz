@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import QuestionImage from "@/components/QuestionImage";
+import GameAiGenerator from "@/components/GameAiGenerator";
 import { connectPair, countCorrect, parseMatchingSet, SAMPLE_MATCHING, shuffleIndexes, type Connections, type MatchingPair, type MatchingSet } from "@/lib/matching";
 import { fetchSets, newId } from "@/lib/storage";
 import type { QuestionSet } from "@/lib/types";
 
 const STORAGE_KEY = "team-quiz:matching-sets";
-const button = "rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 disabled:opacity-50";
+const button = "inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 disabled:opacity-50";
 const input = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900";
 const colors = ["#2563eb", "#db2777", "#d97706", "#7c3aed", "#059669", "#e11d48", "#0891b2", "#9333ea"];
 const emptyPair = (): MatchingPair => ({ left: "", right: "" });
@@ -20,6 +21,7 @@ function Editor({ initial, onSave, onCancel }: { initial?: MatchingSet; onSave: 
   const [setId, setSetId] = useState("");
   const [loadError, setLoadError] = useState("");
   const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
   const selectedSet = sets.find((set) => set.id === setId);
 
   useEffect(() => {
@@ -45,7 +47,15 @@ function Editor({ initial, onSave, onCancel }: { initial?: MatchingSet; onSave: 
 
   return <section aria-label="Soạn bộ nối ý" className="mb-6 space-y-4 rounded-3xl bg-white p-5 shadow-sm">
     <h2 className="text-xl font-extrabold text-indigo-800">{initial ? "✏️ Sửa bộ nối ý" : "✨ Tạo bộ nối ý"}</h2>
+    <fieldset disabled={busy} className="space-y-4 disabled:opacity-60">
     <label className="block font-bold">Tên bộ nối ý<input className={input} value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} /></label>
+    <GameAiGenerator kind="matching" busy={busy} setBusy={setBusy} hasContent={pairs.some((pair) => pair.left.trim() || pair.right.trim() || pair.image)} onApply={(data, topic, count) => {
+      const parsed = parseMatchingSet({ id: "ai", title: "AI", pairs: data && typeof data === "object" && "pairs" in data ? data.pairs : null });
+      if (typeof parsed === "string" || parsed.pairs.length !== count) throw new Error("AI tạo cặp nối ý chưa hợp lệ. Hãy thử lại.");
+      setPairs(parsed.pairs);
+      if (!title.trim()) setTitle(topic.slice(0, 100));
+      setMessage("");
+    }} />
     <label className="block font-bold">Chọn kho câu hỏi (tùy chọn)
       <select className={input} value={setId} onChange={(e) => setSetId(e.target.value)}>
         {!sets.length && <option value="">Không có bộ câu hỏi</option>}
@@ -73,9 +83,10 @@ function Editor({ initial, onSave, onCancel }: { initial?: MatchingSet; onSave: 
       {pair.image && <div><QuestionImage src={pair.image} alt={`Hình minh họa cặp ${index + 1}`} /><button type="button" className="mt-1 text-sm font-bold text-rose-700" onClick={() => update(index, { image: undefined })}>Xóa hình câu hỏi</button></div>}
       {pairs.length > 2 && <button type="button" className="font-bold text-rose-700" onClick={() => setPairs((current) => current.filter((_, i) => i !== index))}>Xóa cặp {index + 1}</button>}
     </fieldset>)}
-    <button type="button" className="rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700 disabled:opacity-50" disabled={pairs.length >= 8} onClick={() => setPairs((current) => [...current, emptyPair()])}>+ Thêm cặp</button>
+    <button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700 disabled:opacity-50" disabled={pairs.length >= 8} onClick={() => setPairs((current) => [...current, emptyPair()])}>+ Thêm cặp</button>
     {message && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-rose-700">{message}</p>}
-    <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={save}>Lưu bộ nối ý</button><button type="button" className="rounded-xl bg-slate-100 px-4 py-2 font-bold" onClick={onCancel}>Hủy</button></div>
+    <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={save}>Lưu bộ nối ý</button><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 font-bold" onClick={onCancel}>Hủy</button></div>
+    </fieldset>
   </section>;
 }
 
@@ -130,7 +141,7 @@ function Game({ game, onExit }: { game: MatchingSet; onExit: () => void }) {
   }
 
   return <section className="space-y-4 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-2xl font-extrabold text-indigo-800">{game.title}</h2><button type="button" className="font-bold text-indigo-700" onClick={onExit}>← Danh sách bộ nối ý</button></div>
+    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-2xl font-extrabold text-indigo-800">{game.title}</h2><button type="button" className="back-link" onClick={onExit}>← Danh sách bộ nối ý</button></div>
     <p className="text-slate-700">Kéo ý bên trái sang ý bên phải, hoặc chạm lần lượt hai ý để nối. Chọn lại để đổi cặp.</p>
     <p aria-live="polite" className="font-bold text-indigo-800">{count}/{game.pairs.length} cặp đã nối{selected !== null ? ` · Đã chọn ý trái ${selected + 1}` : ""}</p>
     <div ref={board} className="relative grid grid-cols-2 gap-10 sm:gap-16">
@@ -164,8 +175,8 @@ function Game({ game, onExit }: { game: MatchingSet; onExit: () => void }) {
     </div>
     <div className="flex flex-wrap gap-2">
       <button type="button" className={button} disabled={count === 0} onClick={() => { setSelected(null); setChecked(true); }}>Kiểm tra</button>
-      <button type="button" className="rounded-xl bg-slate-100 px-4 py-2 font-bold text-slate-700" onClick={reset}>Chơi lại</button>
-      <button type="button" className="rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700 disabled:opacity-50" disabled={selected === null || connections[selected] === undefined} onClick={() => {
+      <button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 font-bold text-slate-700" onClick={reset}>Chơi lại</button>
+      <button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700 disabled:opacity-50" disabled={selected === null || connections[selected] === undefined} onClick={() => {
         if (selected === null) return;
         setConnections((current) => { const next = { ...current }; delete next[selected]; return next; });
         setSelected(null);
@@ -220,7 +231,7 @@ export default function MatchingPage() {
   }
 
   return <main className="mx-auto w-full max-w-4xl flex-1 p-4 sm:p-6">
-    <Link href="/" className="font-bold text-indigo-700">← Về trang chủ</Link>
+    <Link href="/" className="back-link">← Trang chủ</Link>
     <header className="my-5 rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white"><h1 className="text-3xl font-extrabold">🧷 Kéo thả nối ý</h1><p className="mt-2">Tìm những ý phù hợp và nối chúng lại với nhau nhé!</p></header>
     <p className="mb-4 text-sm text-slate-700">Bộ tự tạo chỉ lưu trên trình duyệt này, không đồng bộ giữa các thiết bị. Tiến độ chơi không được lưu.</p>
     {error && <p role="alert" className="mb-4 rounded-xl bg-rose-50 p-3 text-rose-700">{error}</p>}
@@ -231,7 +242,7 @@ export default function MatchingPage() {
         <ul className="grid gap-4 sm:grid-cols-2">{[SAMPLE_MATCHING, ...items].map((item) => <li key={item.id} className="rounded-2xl bg-white p-5 shadow-sm">
           <h3 className="text-lg font-extrabold text-slate-800">{item.title}</h3><p className="my-2 text-sm text-slate-600">{item.pairs.length} cặp · {item.id === SAMPLE_MATCHING.id ? "Bài mẫu" : "Tự tạo"}</p>
           <div className="flex flex-wrap gap-2"><button type="button" className={button} onClick={() => { setEditing(null); setPlaying(item); }}>Chơi</button>
-            {item.id !== SAMPLE_MATCHING.id && ready && <><button type="button" className="rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700" onClick={() => setEditing(item.id)}>Sửa</button><button type="button" className="rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700" onClick={() => remove(item)}>Xóa</button></>}
+            {item.id !== SAMPLE_MATCHING.id && ready && <><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-50 px-4 py-2 font-bold text-indigo-700" onClick={() => setEditing(item.id)}>Sửa</button><button type="button" className="min-h-11 inline-flex items-center justify-center rounded-xl bg-rose-50 px-4 py-2 font-bold text-rose-700" onClick={() => remove(item)}>Xóa</button></>}
           </div>
         </li>)}</ul>
       </section>

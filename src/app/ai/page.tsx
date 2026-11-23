@@ -25,7 +25,7 @@ export default function AiPage() {
   }
 
   return <main className="mx-auto w-full max-w-3xl flex-1 p-4 sm:p-6">
-    <Link href="/" className="font-bold text-indigo-700">← Về trang chủ</Link>
+    <Link href="/" className="back-link">← Trang chủ</Link>
     <header className="my-5 rounded-3xl bg-violet-600 p-6 text-white">
       <h1 className="text-3xl font-extrabold">✨ Trợ lý học tập</h1>
       <p className="mt-2">Bé hãy hỏi một câu về bài học để nhận gợi ý nhé!</p>
@@ -35,7 +35,7 @@ export default function AiPage() {
       <label className="block font-bold">Câu hỏi của bé
         <textarea value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={500} rows={4} placeholder="Ví dụ: Làm sao để cộng hai số?" className="mt-2 block w-full rounded-xl border border-slate-300 p-3 font-normal" />
       </label>
-      <button type="button" disabled={busy} onClick={ask} className="rounded-xl bg-violet-600 px-5 py-3 font-bold text-white disabled:opacity-50">{busy ? "Đang suy nghĩ…" : "Gửi câu hỏi"}</button>
+      <button type="button" disabled={busy} onClick={ask} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-3 font-bold text-white disabled:opacity-50">{busy ? "Đang suy nghĩ…" : "Gửi câu hỏi"}</button>
       {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-rose-700">{error}</p>}
       {answer && <div role="status" className="whitespace-pre-wrap rounded-2xl bg-emerald-50 p-4 text-slate-800">{answer}</div>}
     </section>

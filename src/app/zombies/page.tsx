@@ -53,7 +53,7 @@ export default function ZombiesPage() {
 
   if (!game) return (
     <main className="mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6">
-      <Link href="/" className="font-bold text-indigo-700 hover:underline">← Danh sách trò chơi</Link>
+      <Link href="/" className="back-link">← Trang chủ</Link>
       <header className="my-5 rounded-3xl bg-gradient-to-r from-lime-100 via-emerald-100 to-sky-100 p-6">
         <p className="text-4xl" aria-hidden="true">🧟 🌻 🏡</p>
         <h1 className="mt-2 text-3xl font-extrabold text-emerald-900">Chặn Zombie</h1>
@@ -63,6 +63,7 @@ export default function ZombiesPage() {
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <h2 className="text-xl font-extrabold text-slate-800">Chọn bộ câu hỏi</h2>
         <p className="mt-1 text-sm text-slate-600">Mỗi câu bắt đầu với 30 giây; mỗi lần chọn sai tốc độ tăng thêm 50% tốc độ ban đầu.</p>
+        <Link href="/edit?returnTo=zombies" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-violet-600 px-4 py-2 font-bold text-white hover:bg-violet-700">✨ Tạo bộ câu hỏi bằng AI</Link>
         <label htmlFor="zombie-set" className="mt-4 block font-bold">Bộ câu hỏi trong kho</label>
         <select id="zombie-set" value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3">
           <option value="">{loading ? "Đang tải…" : "Chọn một bộ câu hỏi"}</option>
@@ -82,9 +83,11 @@ export default function ZombiesPage() {
                 </li>)}
               </ol>
             </details>
-            <button type="button" onClick={start} className="mt-4 rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white hover:bg-emerald-700">▶ Bắt đầu chơi</button>
           </> : <p className="mt-3 font-semibold text-rose-700">Chưa đủ câu để chơi. Hãy thêm câu trắc nghiệm hoặc ít nhất hai đáp án khác nhau vào bộ.</p>}
-          <Link href={`/edit?id=${encodeURIComponent(selected.id)}`} className="ml-4 inline-block font-bold text-indigo-700 hover:underline">Sửa bộ câu hỏi</Link>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            {questions.length > 0 && <button type="button" onClick={start} className="min-h-11 rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white hover:bg-emerald-700">▶ Bắt đầu chơi</button>}
+            <Link href={`/edit?id=${encodeURIComponent(selected.id)}`} className="inline-flex min-h-11 items-center rounded-xl px-3 font-bold text-indigo-700 hover:bg-indigo-50">✏️ Sửa bộ câu hỏi</Link>
+          </div>
         </>}
       </section>
     </main>
@@ -97,18 +100,18 @@ export default function ZombiesPage() {
     <main className="w-full flex-1 bg-violet-950 p-3 text-white sm:p-5">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <button type="button" onClick={() => setGame(null)} className="rounded-xl border border-violet-400 px-3 py-2 font-bold hover:bg-violet-800">← Chọn bộ khác</button>
+          <button type="button" onClick={() => setGame(null)} className="min-h-11 rounded-xl border border-violet-400 px-3 py-2 font-bold hover:bg-violet-800">← Chọn bộ khác</button>
           <h1 className="font-extrabold">🧟 Chặn Zombie</h1>
           <span className="font-bold">⭐ {completed}/{game.questions.length}</span>
-          {!finished && <button type="button" onClick={() => act({ type: game.status === "paused" ? "resume" : "pause", now: performance.now() })} className="rounded-xl bg-violet-700 px-4 py-2 font-bold hover:bg-violet-600">{game.status === "paused" ? "▶ Tiếp tục" : "⏸ Tạm dừng"}</button>}
+          {!finished && <button type="button" onClick={() => act({ type: game.status === "paused" ? "resume" : "pause", now: performance.now() })} className="min-h-11 rounded-xl bg-violet-700 px-4 py-2 font-bold hover:bg-violet-600">{game.status === "paused" ? "▶ Tiếp tục" : "⏸ Tạm dừng"}</button>}
         </div>
         {finished ? <section className="mt-6 rounded-3xl bg-white p-8 text-center text-slate-800" role="status">
           <p className="text-5xl" aria-hidden="true">{game.status === "won" ? "🎉 🏡 🌟" : "🧟 🏡 💪"}</p>
           <h2 className="mt-4 text-3xl font-extrabold">{game.status === "won" ? "Bảo vệ thành công!" : "Zombie đã tới hàng rào!"}</h2>
           <p className="mt-2">Đã vượt qua {completed}/{game.questions.length} câu · Chọn sai {game.mistakes} lần</p>
-          <div className="mt-5 flex justify-center gap-3">
-            <button type="button" onClick={start} className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Chơi lại</button>
-            <button type="button" onClick={() => setGame(null)} className="rounded-xl bg-slate-100 px-5 py-3 font-bold text-slate-800 hover:bg-slate-200">Chọn bộ khác</button>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <button type="button" onClick={start} className="min-h-11 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">🔁 Chơi lại</button>
+            <button type="button" onClick={() => setGame(null)} className="min-h-11 rounded-xl bg-slate-100 px-5 py-3 font-bold text-slate-800 hover:bg-slate-200">Chọn bộ khác</button>
           </div>
         </section> : <>
           <section className="mt-4 rounded-3xl bg-amber-50 p-5 text-center text-slate-900">
@@ -119,7 +122,7 @@ export default function ZombiesPage() {
           <div className="mt-3 rounded-xl bg-violet-900 p-3">
             <div className="flex justify-between text-sm font-bold"><span>🏡 Hàng rào</span><span>Zombie đang đến 🧟</span></div>
             <div className="mt-2 h-3 overflow-hidden rounded-full bg-violet-700" role="progressbar" aria-label="Khoảng đường zombie đã đi" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(game.distance * 100)}>
-              <div className="h-full rounded-full bg-lime-400" style={{ width: `${game.distance * 100}%` }} />
+              <div className={`h-full rounded-full transition-[width] ${game.distance > 0.7 ? "bg-rose-500" : "bg-amber-400"}`} style={{ width: `${game.distance * 100}%` }} />
             </div>
           </div>
           <p className="mt-2 min-h-6 text-center font-bold" role="status">{game.status === "paused" ? "Đang tạm dừng" : game.wrong.length ? "Chưa đúng! Zombie chạy nhanh hơn, hãy chọn đáp án khác." : "Chọn đáp án đúng để ngăn zombie!"}</p>

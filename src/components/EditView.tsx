@@ -15,6 +15,7 @@ function blankSet(): QuestionSet {
 export default function EditView() {
   const params = useSearchParams();
   const id = params.get("id");
+  const returnToZombies = params.get("returnTo") === "zombies";
   const [initial, setInitial] = useState<QuestionSet | null>(() => (id ? null : blankSet()));
 
   useEffect(() => {
@@ -31,10 +32,10 @@ export default function EditView() {
   if (!initial) {
     return <main className="mx-auto max-w-xl flex-1 p-6 text-center text-lg text-slate-500">Đang tải…</main>;
   }
-  return <Editor key={initial.id} initial={initial} />;
+  return <Editor key={initial.id} initial={initial} returnToZombies={returnToZombies} />;
 }
 
-function Editor({ initial }: { initial: QuestionSet }) {
+function Editor({ initial, returnToZombies }: { initial: QuestionSet; returnToZombies: boolean }) {
   const router = useRouter();
   const [set, setSet] = useState<QuestionSet>(initial);
   const [error, setError] = useState("");
@@ -98,7 +99,7 @@ function Editor({ initial }: { initial: QuestionSet }) {
     setError("");
     try {
       await upsertSet(saved);
-      router.push("/");
+      router.push(returnToZombies ? "/zombies" : "/");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Không lưu được bộ câu hỏi.");
       setSaving(false);
@@ -108,12 +109,13 @@ function Editor({ initial }: { initial: QuestionSet }) {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 p-6">
       <div className="mb-6 flex items-center justify-between">
-        <Link href="/" className="font-semibold text-indigo-600 hover:underline">
-          ← Trang chủ
+        <Link href={returnToZombies ? "/zombies" : "/"} className="font-semibold text-indigo-600 hover:underline">
+          {returnToZombies ? "← Chặn Zombie" : "← Trang chủ"}
         </Link>
         <h1 className="text-2xl font-extrabold text-indigo-800">Soạn bộ câu hỏi</h1>
       </div>
 
+      <fieldset disabled={generating} className="disabled:opacity-60">
       <section className="mb-6 space-y-3 rounded-2xl bg-white p-5 shadow">
         <label className="block">
           <span className="text-sm font-semibold text-slate-600">Tên bộ câu hỏi</span>
@@ -151,7 +153,7 @@ function Editor({ initial }: { initial: QuestionSet }) {
               {[2, 3, 5, 10].map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
           </label>
-          <button type="button" disabled={generating} onClick={generateQuestions} className="rounded-xl bg-violet-700 px-4 py-2 font-bold text-white disabled:opacity-50">{generating ? "Đang tạo…" : "Tạo câu hỏi"}</button>
+          <button type="button" disabled={generating} onClick={generateQuestions} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-violet-700 px-4 py-2 font-bold text-white disabled:opacity-50">{generating ? "Đang tạo…" : "Tạo câu hỏi"}</button>
         </div>
       </section>
 
@@ -294,6 +296,7 @@ function Editor({ initial }: { initial: QuestionSet }) {
           {saving ? "Đang lưu…" : imagesLoading > 0 ? "Đang tải hình…" : "Lưu bộ câu hỏi"}
         </button>
       </div>
+      </fieldset>
     </main>
   );
 }

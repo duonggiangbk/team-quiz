@@ -19,12 +19,12 @@ export default async function AccountBar() {
         <>
           <span className="text-sm font-semibold text-slate-700">Xin chào, {session.user.name || session.user.email || "bạn"}!</span>
           <form action={signOutFromGoogle}>
-            <button className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-700 shadow-sm hover:bg-indigo-50" type="submit">Đăng xuất</button>
+            <button className="min-h-11 inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-700 shadow-sm hover:bg-indigo-50" type="submit">Đăng xuất</button>
           </form>
         </>
       ) : (
         <form action={signInWithGoogle}>
-          <button className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-700 shadow-sm hover:bg-indigo-50" type="submit">Đăng nhập bằng Google</button>
+          <button className="min-h-11 inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-700 shadow-sm hover:bg-indigo-50" type="submit">Đăng nhập bằng Google</button>
         </form>
       )}
     </div>

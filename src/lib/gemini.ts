@@ -30,7 +30,22 @@ const flashcardSchema = {
   },
 };
 
-export async function generateAiText(instruction: string, input: string, structured: boolean | "flashcards"): Promise<string> {
+const matchingSchema = {
+  type: "ARRAY",
+  items: { type: "OBJECT", properties: { left: { type: "STRING" }, right: { type: "STRING" } }, required: ["left", "right"] },
+};
+
+const crosswordSchema = {
+  type: "ARRAY",
+  items: { type: "OBJECT", properties: { clue: { type: "STRING" }, answer: { type: "STRING" } }, required: ["clue", "answer"] },
+};
+
+const flyingWordsSchema = {
+  type: "ARRAY",
+  items: { type: "OBJECT", properties: { clue: { type: "STRING" }, sentence: { type: "STRING" } }, required: ["clue", "sentence"] },
+};
+
+export async function generateAiText(instruction: string, input: string, structured: boolean | "flashcards" | "matching" | "crossword" | "flying-words"): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new AiError("Chưa cấu hình GEMINI_API_KEY trên máy chủ.", 503);
   const redis = getRedis();
@@ -58,7 +73,7 @@ export async function generateAiText(instruction: string, input: string, structu
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: instruction }] },
         contents: [{ role: "user", parts: [{ text: input }] }],
-        generationConfig: { maxOutputTokens: 4096, ...(structured ? { responseMimeType: "application/json", responseSchema: structured === "flashcards" ? flashcardSchema : schema } : {}) },
+        generationConfig: { maxOutputTokens: 4096, ...(structured ? { responseMimeType: "application/json", responseSchema: structured === "flashcards" ? flashcardSchema : structured === "matching" ? matchingSchema : structured === "crossword" ? crosswordSchema : structured === "flying-words" ? flyingWordsSchema : schema } : {}) },
         safetySettings: ["HARM_CATEGORY_HARASSMENT", "HARM_CATEGORY_HATE_SPEECH", "HARM_CATEGORY_SEXUALLY_EXPLICIT", "HARM_CATEGORY_DANGEROUS_CONTENT"].map((category) => ({ category, threshold: "BLOCK_LOW_AND_ABOVE" })),
       }),
     });

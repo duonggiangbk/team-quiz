@@ -71,14 +71,14 @@ export default function StudentView() {
   }
 
   return <main className="mx-auto w-full max-w-3xl flex-1 p-4 sm:p-6">
-    <Link href="/" className="font-bold text-indigo-700">← Về trang chủ</Link>
+    <Link href="/" className="back-link">← Trang chủ</Link>
     <header className="my-5 rounded-3xl bg-emerald-600 p-6 text-white">
       <h1 className="text-3xl font-extrabold">🎒 Cùng làm bài nhé!</h1>
       <p className="mt-2">Nhập mã cô giáo hoặc thầy giáo đã gửi cho bé.</p>
     </header>
     <form onSubmit={(e) => { e.preventDefault(); void load(code); }} className="flex flex-wrap gap-2 rounded-2xl bg-white p-4 shadow-sm">
       <input aria-label="Mã bài tập" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={12} placeholder="Nhập mã bài" className="min-w-0 flex-1 rounded-xl border border-slate-300 p-3 font-mono uppercase" />
-      <button disabled={busy} className="rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white disabled:opacity-50">Mở bài</button>
+      <button disabled={busy} className="min-h-11 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white disabled:opacity-50">Mở bài</button>
     </form>
     {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-4 font-bold text-rose-700">{error}</p>}
     {assignment && (result ? <section className="mt-5 rounded-3xl bg-amber-100 p-8 text-center">
