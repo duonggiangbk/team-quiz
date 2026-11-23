@@ -9,6 +9,17 @@ import type { GameState, QuestionSet } from "@/lib/types";
 const ALL = "Tất cả";
 const MINE = "Của tôi";
 
+const FEATURES = [
+  { id: "questions", label: "Kho câu hỏi", icon: "📚" },
+  { id: "assignments", label: "Bài đã giao", icon: "📋" },
+  { id: "ai", label: "Công cụ AI", icon: "✨" },
+  { id: "community", label: "Cộng đồng", icon: "🤝" },
+  { id: "utilities", label: "Tiện ích dạy học", icon: "🧰" },
+  { id: "simulations", label: "Mô phỏng bài học", icon: "🎨" },
+  { id: "courses", label: "Khóa học", icon: "🎓" },
+] as const;
+type Feature = (typeof FEATURES)[number]["id"];
+
 function normalize(text: string) {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
 }
@@ -22,6 +33,7 @@ export default function HomeView() {
   const [game, setGame] = useState<GameState | null>(() => loadGame());
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(ALL);
+  const [feature, setFeature] = useState<Feature>("questions");
 
   const shown = useMemo(() => {
     const q = normalize(query.trim());
@@ -66,17 +78,24 @@ export default function HomeView() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 p-6">
+    <main className="mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6">
       <header className="mb-8 rounded-3xl border-4 border-white bg-gradient-to-r from-sky-100 via-indigo-100 to-pink-100 p-6 text-center shadow-sm">
         <p className="mb-2 text-3xl" aria-hidden="true">🌟 🎈 🧩</p>
         <h1 className="text-4xl font-extrabold text-indigo-800 sm:text-5xl">Ô Số Đồng Đội</h1>
         <p className="mt-2 text-lg font-semibold text-indigo-700">Cùng chọn ô, khám phá và ghi điểm nhé!</p>
       </header>
-      <nav aria-label="Công cụ học tập" className="mb-6 flex flex-wrap gap-3">
-        <Link href="/assignments" className="rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">📋 Giao bài &amp; báo cáo</Link>
-        <Link href="/join" className="rounded-2xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">🎒 Nhập mã làm bài</Link>
+      <nav aria-label="Nhóm tính năng" className="mb-6 flex flex-wrap gap-2 rounded-2xl bg-white p-3 shadow-sm">
+        {FEATURES.map((item) => (
+          <button key={item.id} type="button" aria-pressed={feature === item.id} onClick={() => setFeature(item.id)}
+            className={`rounded-xl px-4 py-3 text-left text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+              feature === item.id ? "bg-indigo-600 text-white" : "text-slate-700 hover:bg-indigo-50"
+            }`}>
+            <span aria-hidden="true">{item.icon} </span>{item.label}
+          </button>
+        ))}
       </nav>
 
+      {feature === "questions" && <section aria-label="Kho câu hỏi">
       {game && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-amber-100 p-4">
           <span className="font-semibold text-amber-900">
@@ -193,6 +212,36 @@ export default function HomeView() {
           ))}
         </ul>
       )}
+      </section>}
+
+      {feature === "assignments" && <section className="rounded-3xl bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold uppercase tracking-wide text-indigo-600">Dành cho lớp học</p>
+        <h2 className="mt-2 text-2xl font-extrabold">📋 Bài đã giao &amp; báo cáo</h2>
+        <p className="mt-2 text-slate-600">Giáo viên giao bài bằng mã hoặc liên kết, xem điểm và kết quả của các bé.</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link href="/assignments" className="rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Giao bài &amp; xem báo cáo</Link>
+          <Link href="/join" className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Nhập mã làm bài</Link>
+        </div>
+      </section>}
+
+      {feature === "ai" && <section className="rounded-3xl bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold uppercase tracking-wide text-violet-600">Cùng AI khám phá</p>
+        <h2 className="mt-2 text-2xl font-extrabold">✨ Công cụ AI</h2>
+        <p className="mt-2 text-slate-600">Tạo câu hỏi theo chủ đề hoặc nhận gợi ý học tập. Giáo viên cần kiểm tra nội dung do AI tạo.</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link href="/edit" className="rounded-xl bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700">Tạo câu hỏi bằng AI</Link>
+          <Link href="/ai" className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Trợ lý học tập</Link>
+        </div>
+      </section>}
+
+      {feature !== "questions" && feature !== "assignments" && feature !== "ai" && (() => {
+        const selected = FEATURES.find((item) => item.id === feature);
+        return <section className="rounded-3xl bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-extrabold"><span aria-hidden="true">{selected?.icon} </span>{selected?.label}</h2>
+          <p className="mt-3 rounded-2xl bg-amber-50 p-4 text-amber-900">Tính năng này chưa được triển khai. Bạn có thể sử dụng kho câu hỏi, bài giao và công cụ AI trong lúc chờ.</p>
+          <button type="button" onClick={() => setFeature("questions")} className="mt-4 rounded-xl bg-indigo-600 px-5 py-3 font-bold text-white hover:bg-indigo-700">Về kho câu hỏi</button>
+        </section>;
+      })()}
     </main>
   );
 }

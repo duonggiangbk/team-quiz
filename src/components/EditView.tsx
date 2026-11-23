@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import QuestionImage from "@/components/QuestionImage";
-import { fetchSet, newId, newQuestion, upsertSet } from "@/lib/storage";
+import { errorMessage, fetchSet, newId, newQuestion, upsertSet, writeRequest } from "@/lib/storage";
 import type { Question, QuestionSet } from "@/lib/types";
 import { isValidImage, MAX_IMAGE_FILE_BYTES } from "@/lib/validate";
 
@@ -40,6 +40,25 @@ function Editor({ initial }: { initial: QuestionSet }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [imagesLoading, setImagesLoading] = useState(0);
+  const [topic, setTopic] = useState("");
+  const [level, setLevel] = useState("Tiểu học");
+  const [count, setCount] = useState(5);
+  const [generating, setGenerating] = useState(false);
+
+  async function generateQuestions() {
+    if (!topic.trim()) { setError("Hãy nhập chủ đề để AI tạo câu hỏi."); return; }
+    if (set.questions.length + count > 100) { setError("Bộ câu hỏi tối đa 100 câu. Hãy xóa bớt câu trước."); return; }
+    setGenerating(true);
+    setError("");
+    try {
+      const response = await writeRequest("/api/ai", { method: "POST", body: JSON.stringify({ kind: "questions", topic, level, count }) });
+      if (!response.ok) throw new Error(await errorMessage(response));
+      const data = await response.json() as { questions: Question[] };
+      setSet((current) => ({ ...current, questions: [...current.questions, ...data.questions.map((q) => ({ ...q, id: newId() }))] }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Không tạo được câu hỏi.");
+    } finally { setGenerating(false); }
+  }
 
   function updateQuestion(id: string, patch: Partial<Question>) {
     setSet((s) => ({ ...s, questions: s.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) }));
@@ -113,6 +132,27 @@ function Editor({ initial }: { initial: QuestionSet }) {
             className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2"
           />
         </label>
+      </section>
+
+      <section className="mb-6 space-y-3 rounded-2xl bg-violet-50 p-5">
+        <h2 className="text-xl font-bold text-violet-900">✨ Tạo câu hỏi bằng AI</h2>
+        <p className="text-sm text-violet-800">Không nhập thông tin cá nhân. Giáo viên cần kiểm tra và sửa câu hỏi, đáp án trước khi lưu.</p>
+        <label className="block font-semibold">Chủ đề
+          <input value={topic} onChange={(e) => setTopic(e.target.value)} maxLength={300} placeholder="Ví dụ: Phép cộng trong phạm vi 10" className="mt-1 w-full rounded-xl border border-violet-200 bg-white p-3 font-normal" />
+        </label>
+        <div className="flex flex-wrap gap-3">
+          <label className="font-semibold">Độ tuổi
+            <select value={level} onChange={(e) => setLevel(e.target.value)} className="ml-2 rounded-xl border border-violet-200 bg-white p-2">
+              <option>Mầm non</option><option>Tiểu học</option><option>Trung học cơ sở</option>
+            </select>
+          </label>
+          <label className="font-semibold">Số câu
+            <select value={count} onChange={(e) => setCount(Number(e.target.value))} className="ml-2 rounded-xl border border-violet-200 bg-white p-2">
+              {[2, 3, 5, 10].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+          <button type="button" disabled={generating} onClick={generateQuestions} className="rounded-xl bg-violet-700 px-4 py-2 font-bold text-white disabled:opacity-50">{generating ? "Đang tạo…" : "Tạo câu hỏi"}</button>
+        </div>
       </section>
 
       <ol className="space-y-4">
